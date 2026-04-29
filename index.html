@@ -815,8 +815,92 @@
           return domCache[id];
         }
 
+        function resetLesson() {
+          // Reset application state
+          decCount = 0;
+          completedSteps = [false, false, false, false];
+          currentActiveStep = 1;
+          bits = [0, 0, 0, 0, 0, 0, 0, 0];
+
+          // Reset decimal counter display
+          const decDisplay = cacheElement("dec-display");
+          if (decDisplay) decDisplay.innerText = "0";
+
+          // Clear all conversion table inputs
+          for (let i = 1; i <= 4; i++) {
+            const vInput = cacheElement(`v-${i}`);
+            const qInput = cacheElement(`q-${i}`);
+            const rInput = cacheElement(`r-${i}`);
+            const btn = cacheElement(`btn-${i}`);
+            const row = cacheElement(`row-${i}`);
+            const stack = cacheElement(`stack-${i}`);
+
+            if (vInput) {
+              vInput.value = i === 1 ? "13" : "";
+              vInput.readOnly = i === 1;
+              vInput.classList.remove("input-error", "input-success");
+              vInput.disabled = false;
+            }
+            if (qInput) {
+              qInput.value = "";
+              qInput.classList.remove("input-error", "input-success");
+              qInput.disabled = false;
+            }
+            if (rInput) {
+              rInput.value = "";
+              rInput.classList.remove("input-error", "input-success");
+              rInput.disabled = false;
+            }
+            if (btn) {
+              btn.disabled = false;
+              btn.innerText = "Verify Step";
+            }
+            if (row) {
+              if (i === 1) {
+                row.classList.add("row-active");
+                row.classList.remove("opacity-20", "pointer-events-none");
+              } else {
+                row.classList.remove("row-active");
+                row.classList.add("opacity-20", "pointer-events-none");
+              }
+            }
+            if (stack) {
+              stack.classList.remove("visible");
+            }
+          }
+
+          // Reset binary result display
+          const binaryText = cacheElement("binary-final-text");
+          if (binaryText) binaryText.innerText = "????";
+
+          // Reset bit display
+          updateFlipper();
+
+          // Clear verification status
+          const status = cacheElement("verification-status");
+          if (status) {
+            status.className = "hidden";
+            status.innerText = "";
+          }
+
+          // Lock all next buttons
+          for (let i = 1; i <= 3; i++) {
+            const nextBtn = cacheElement(`next-btn-${i}`);
+            if (nextBtn) {
+              nextBtn.disabled = true;
+              nextBtn.classList.add("btn-locked");
+              nextBtn.classList.remove("next-btn-anim");
+            }
+          }
+        }
+
         function goToStep(num) {
           if (isProcessing) return;
+
+          if (num === 0) {
+            resetLesson();
+          }
+
           currentStep = num;
           document
             .querySelectorAll(".lesson-step")
