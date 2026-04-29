@@ -110,6 +110,50 @@
         color: #1e40af;
         font-weight: bold;
       }
+
+      /* Landing page animations */
+      @keyframes fade-in-up {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes fade-in-down {
+        from {
+          opacity: 0;
+          transform: translateY(-30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes fade-in {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      .animate-fade-in-up {
+        animation: fade-in-up 1s ease-out 0.3s both;
+      }
+
+      .animate-fade-in-down {
+        animation: fade-in-down 1s ease-out 0.1s both;
+      }
+
+      .animate-fade-in {
+        animation: fade-in 1s ease-out 0.6s both;
+      }
     </style>
   </head>
   <body class="bg-slate-50 min-h-screen text-slate-800 font-sans pb-20">
@@ -157,7 +201,7 @@
       <!-- STEP 0: LANDING PAGE -->
       <section
         id="step-0"
-        class="lesson-step min-h-[80vh] flex flex-col items-center justify-center text-center space-y-8 py-20"
+        class="lesson-step min-h-screen flex flex-col items-center justify-center text-center space-y-8 py-20 overflow-hidden"
       >
         <div
           class="absolute inset-0 overflow-hidden binary-bg opacity-10 pointer-events-none flex flex-wrap gap-4 text-2xl leading-none pt-10 px-10"
@@ -167,16 +211,18 @@
         </div>
         <div class="relative z-10 space-y-4">
           <div
-            class="inline-block bg-indigo-100 text-indigo-700 px-4 py-1 rounded-full text-xs font-bold tracking-widest uppercase mb-4"
+            class="inline-block bg-indigo-100 text-indigo-700 px-4 py-1 rounded-full text-xs font-bold tracking-widest uppercase mb-4 animate-fade-in-down"
           >
             Master the Digital Foundations
           </div>
           <h1
-            class="text-7xl md:text-9xl font-black tracking-tighter text-slate-900"
+            class="text-7xl md:text-9xl font-black tracking-tighter text-slate-900 animate-fade-in-up"
           >
             ARCHITECT
           </h1>
-          <p class="text-xl text-slate-500 max-w-lg mx-auto leading-relaxed">
+          <p
+            class="text-xl text-slate-500 max-w-lg mx-auto leading-relaxed animate-fade-in"
+          >
             A journey from the numbers you know to the code computers breathe.
           </p>
         </div>
