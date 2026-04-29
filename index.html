@@ -386,7 +386,8 @@
               </h2>
               <p class="text-slate-500">
                 Solve the conversion for
-                <span class="text-indigo-600 font-bold">13</span> by dividing by 2 each time.
+                <span class="text-indigo-600 font-bold">13</span> by dividing by
+                2 each time.
               </p>
             </div>
             <button
@@ -403,7 +404,7 @@
                 class="bg-slate-900 rounded-2xl p-6 text-white font-mono text-sm overflow-x-auto"
               >
                 <div
-                  class="grid grid-cols-12 gap-2 mb-4 text-[10px] uppercase text-slate-500 font-bold tracking-widest min-w-[300px]"
+                  class="grid grid-cols-12 gap-2 mb-4 text-xs uppercase text-slate-500 font-bold tracking-widest min-w-[300px]"
                 >
                   <div class="col-span-1">#</div>
                   <div class="col-span-2 text-center">Value</div>
@@ -422,9 +423,10 @@
                     type="number"
                     id="v-1"
                     class="col-span-2 bg-slate-800 border border-slate-700 rounded p-1 text-center outline-none"
-                    placeholder="13"
+                    value="13"
+                    readonly
                   />
-                  <div class="col-span-1 text-center text-slate-500 text-[8px]">
+                  <div class="col-span-1 text-center text-slate-500 text-xs">
                     ÷2
                   </div>
                   <input
@@ -442,7 +444,7 @@
                   <button
                     id="btn-1"
                     onclick="verifyStep(1)"
-                    class="col-span-4 bg-indigo-600 text-white rounded py-1 text-[10px] font-bold check-btn"
+                    class="col-span-4 bg-indigo-600 text-white rounded py-1 text-xs font-bold check-btn"
                   >
                     Verify Step
                   </button>
@@ -457,8 +459,9 @@
                     id="v-2"
                     class="col-span-2 bg-slate-800 border border-slate-700 rounded p-1 text-center outline-none"
                     placeholder="?"
+                    readonly
                   />
-                  <div class="col-span-1 text-center text-slate-500 text-[8px]">
+                  <div class="col-span-1 text-center text-slate-500 text-xs">
                     ÷2
                   </div>
                   <input
@@ -476,7 +479,7 @@
                   <button
                     id="btn-2"
                     onclick="verifyStep(2)"
-                    class="col-span-4 bg-indigo-600 text-white rounded py-1 text-[10px] font-bold check-btn"
+                    class="col-span-4 bg-indigo-600 text-white rounded py-1 text-xs font-bold check-btn"
                   >
                     Verify Step
                   </button>
@@ -491,8 +494,9 @@
                     id="v-3"
                     class="col-span-2 bg-slate-800 border border-slate-700 rounded p-1 text-center outline-none"
                     placeholder="?"
+                    readonly
                   />
-                  <div class="col-span-1 text-center text-slate-500 text-[8px]">
+                  <div class="col-span-1 text-center text-slate-500 text-xs">
                     ÷2
                   </div>
                   <input
@@ -510,7 +514,7 @@
                   <button
                     id="btn-3"
                     onclick="verifyStep(3)"
-                    class="col-span-4 bg-indigo-600 text-white rounded py-1 text-[10px] font-bold check-btn"
+                    class="col-span-4 bg-indigo-600 text-white rounded py-1 text-xs font-bold check-btn"
                   >
                     Verify Step
                   </button>
@@ -525,8 +529,9 @@
                     id="v-4"
                     class="col-span-2 bg-slate-800 border border-slate-700 rounded p-1 text-center outline-none"
                     placeholder="?"
+                    readonly
                   />
-                  <div class="col-span-1 text-center text-slate-500 text-[8px]">
+                  <div class="col-span-1 text-center text-slate-500 text-xs">
                     ÷2
                   </div>
                   <input
@@ -544,7 +549,7 @@
                   <button
                     id="btn-4"
                     onclick="verifyStep(4)"
-                    class="col-span-4 bg-indigo-600 text-white rounded py-1 text-[10px] font-bold check-btn"
+                    class="col-span-4 bg-indigo-600 text-white rounded py-1 text-xs font-bold check-btn"
                   >
                     Verify Step
                   </button>
@@ -565,7 +570,7 @@
               class="flex flex-col justify-center items-center bg-slate-50 rounded-3xl p-8 border border-dashed border-slate-300"
             >
               <p
-                class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-6"
+                class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6"
               >
                 Result Stack (Read Bottom to Top)
               </p>
@@ -643,7 +648,7 @@
               </div>
               <div class="text-right">
                 <div
-                  class="text-[10px] uppercase font-black text-slate-400 tracking-widest mb-1"
+                  class="text-xs uppercase font-black text-slate-400 tracking-widest mb-1"
                 >
                   Total Value
                 </div>
@@ -662,7 +667,7 @@
             >
               <div
                 id="bit-container"
-                class="flex flex-row-reverse justify-between gap-2 md:gap-4"
+                class="flex justify-between gap-2 md:gap-4"
               ></div>
             </div>
 
@@ -671,7 +676,7 @@
               <div class="flex items-center gap-4">
                 <div class="h-[2px] flex-1 bg-slate-200"></div>
                 <span
-                  class="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em]"
+                  class="text-xs font-black uppercase text-slate-400 tracking-[0.2em]"
                   >Live Addition Logic</span
                 >
                 <div class="h-[2px] flex-1 bg-slate-200"></div>
@@ -712,7 +717,7 @@
           <div class="relative z-10">
             <div class="text-center mb-10">
               <span
-                class="bg-indigo-500/20 text-indigo-300 px-4 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest"
+                class="bg-indigo-500/20 text-indigo-300 px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest"
                 >Architect Level: Master</span
               >
               <h2 class="text-5xl font-black mt-4">Numbers Sandbox</h2>
@@ -940,7 +945,9 @@
               );
               nextRow.classList.add("row-active");
 
-              cacheElement(`v-${currentActiveStep}`).value = target.q;
+              const nextValueInput = cacheElement(`v-${currentActiveStep}`);
+              nextValueInput.value = target.q;
+              nextValueInput.readOnly = true;
               cacheElement(`q-${currentActiveStep}`).focus();
             }
             updateBinaryResult();
