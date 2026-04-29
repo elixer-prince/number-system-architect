@@ -245,8 +245,8 @@
                 What is the decimal system?
               </h2>
               <p class="text-slate-500 max-w-lg">
-                The <strong>Decimal</strong> system (also called Base-10) uses ten symbols:
-                <strong>0-9</strong>.
+                The <strong>Decimal</strong> system (also called Base-10) uses
+                ten symbols: <strong>0-9</strong>.
               </p>
             </div>
           </div>
@@ -422,13 +422,13 @@
         </div>
       </section>
 
-      <!-- STEP 2: PHASE 2 - THE CONVERSION GUIDE -->
+      <!-- STEP 2: PHASE 1 - THE CONVERSION GUIDE -->
       <section id="step-2" class="lesson-step hidden space-y-8">
         <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-200">
           <div class="flex justify-between items-center mb-8">
             <div>
               <h2 class="text-3xl font-black text-slate-900 mb-2">
-                Phase 2: Build the Logic
+                Phase 1: Build the Logic
               </h2>
               <p class="text-slate-500">
                 Solve the conversion for
@@ -480,12 +480,14 @@
                     id="q-1"
                     class="col-span-2 bg-slate-800 border border-slate-700 rounded p-1 text-center outline-none"
                     placeholder="?"
+                    onkeypress="if (event.key === 'Enter') verifyStep(1);"
                   />
                   <input
                     type="number"
                     id="r-1"
                     class="col-span-2 bg-slate-800 border border-slate-700 rounded p-1 text-center outline-none"
                     placeholder="?"
+                    onkeypress="if (event.key === 'Enter') verifyStep(1);"
                   />
                   <button
                     id="btn-1"
@@ -515,12 +517,14 @@
                     id="q-2"
                     class="col-span-2 bg-slate-800 border border-slate-700 rounded p-1 text-center outline-none"
                     placeholder="?"
+                    onkeypress="if (event.key === 'Enter') verifyStep(2);"
                   />
                   <input
                     type="number"
                     id="r-2"
                     class="col-span-2 bg-slate-800 border border-slate-700 rounded p-1 text-center outline-none"
                     placeholder="?"
+                    onkeypress="if (event.key === 'Enter') verifyStep(2);"
                   />
                   <button
                     id="btn-2"
@@ -550,12 +554,14 @@
                     id="q-3"
                     class="col-span-2 bg-slate-800 border border-slate-700 rounded p-1 text-center outline-none"
                     placeholder="?"
+                    onkeypress="if (event.key === 'Enter') verifyStep(3);"
                   />
                   <input
                     type="number"
                     id="r-3"
                     class="col-span-2 bg-slate-800 border border-slate-700 rounded p-1 text-center outline-none"
                     placeholder="?"
+                    onkeypress="if (event.key === 'Enter') verifyStep(3);"
                   />
                   <button
                     id="btn-3"
@@ -585,12 +591,14 @@
                     id="q-4"
                     class="col-span-2 bg-slate-800 border border-slate-700 rounded p-1 text-center outline-none"
                     placeholder="?"
+                    onkeypress="if (event.key === 'Enter') verifyStep(4);"
                   />
                   <input
                     type="number"
                     id="r-4"
                     class="col-span-2 bg-slate-800 border border-slate-700 rounded p-1 text-center outline-none"
                     placeholder="?"
+                    onkeypress="if (event.key === 'Enter') verifyStep(4);"
                   />
                   <button
                     id="btn-4"
@@ -672,7 +680,7 @@
         </div>
       </section>
 
-      <!-- STEP 3: PHASE 3 - VERIFICATION -->
+      <!-- STEP 3: PHASE 2 - VERIFICATION -->
       <section id="step-3" class="lesson-step hidden space-y-6">
         <div
           class="bg-white p-10 rounded-[3rem] shadow-sm border border-slate-200"
@@ -681,7 +689,7 @@
             <div class="flex justify-between items-start mb-10">
               <div>
                 <h2 class="text-3xl font-black text-slate-900 mb-2">
-                  Phase 3: The Testing Rig
+                  Phase 2: The Testing Rig
                 </h2>
                 <p class="text-slate-500 max-w-lg">
                   In computer hardware, numbers are physical voltages. We've
@@ -1006,7 +1014,7 @@
           }
         }
 
-        // PHASE 2
+        // PHASE 1
         const correctAnswers = [
           { v: TARGET_DECIMAL, q: 6, r: 1 },
           { v: 6, q: 3, r: 0 },
@@ -1101,7 +1109,7 @@
           if (completedSteps.every((s) => s)) unlockButton(2);
         }
 
-        // PHASE 3 - 8 BIT
+        // PHASE 2 - 8 BIT
         function initBitFlipper() {
           const container = cacheElement("bit-container");
           container.innerHTML = "";
