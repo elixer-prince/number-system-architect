@@ -48,6 +48,19 @@
       .input-error {
         border: 2px solid #ef4444 !important;
         background-color: #fef2f2 !important;
+        animation: shake 0.3s ease-in-out;
+      }
+      @keyframes shake {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        25% {
+          transform: translateX(-4px);
+        }
+        75% {
+          transform: translateX(4px);
+        }
       }
       .input-success {
         border: 2px solid #22c55e !important;
@@ -137,7 +150,7 @@
             </svg>
           </button>
           <h1 class="font-bold text-slate-900 tracking-tight">
-            Number System Architect
+            Number Architect
           </h1>
         </div>
         <div class="flex items-center gap-4">
@@ -163,7 +176,7 @@
       >
         <div class="space-y-4">
           <h1 class="text-8xl font-black tracking-tighter text-slate-900">
-            NUMBER SYSTEM ARCHITECT
+            ARCHITECT
           </h1>
           <p class="text-xl text-slate-500 max-w-md mx-auto">
             Master the digital language of computers through structural logic.
@@ -345,7 +358,7 @@
         </div>
       </section>
 
-      <!-- NEW STEP 3: THE CONVERSION LOGIC EXPLANATION -->
+      <!-- STEP 3: THE CONVERSION LOGIC EXPLANATION -->
       <section id="step-3" class="page-transition hidden space-y-8">
         <div
           class="bg-white p-12 rounded-[3.5rem] shadow-sm border border-slate-200"
@@ -404,17 +417,6 @@
                   read from bottom to top.
                 </p>
               </div>
-            </div>
-
-            <div
-              class="bg-indigo-50 p-6 rounded-2xl border border-indigo-100 flex items-start gap-4"
-            >
-              <div class="text-2xl mt-1">💡</div>
-              <p class="text-sm text-indigo-700 leading-relaxed">
-                Think of it like peeling an onion. Every time you divide by 2,
-                you are peeling away the <strong>least significant</strong> part
-                of the number to find out if it's even (0) or odd (1).
-              </p>
             </div>
 
             <div class="flex justify-center pt-6">
@@ -517,31 +519,23 @@
               <span
                 class="font-mono font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded"
                 >1101</span
-              >. In a computer, these aren't just numbers on a page—they are
-              <strong>physical states</strong>.
+              >.
             </p>
 
             <div class="grid grid-cols-2 gap-4 mt-8">
               <div class="p-6 bg-slate-50 rounded-3xl border border-slate-100">
                 <h3 class="font-bold text-lg mb-2">The "1" (High)</h3>
                 <p class="text-sm text-slate-500">
-                  Represents an "On" switch, allowing electricity to flow. Each
-                  switch represents a specific value (1, 2, 4, 8...).
+                  Represents an "On" switch, allowing electricity to flow.
                 </p>
               </div>
               <div class="p-6 bg-slate-50 rounded-3xl border border-slate-100">
                 <h3 class="font-bold text-lg mb-2">The "0" (Low)</h3>
                 <p class="text-sm text-slate-500">
-                  Represents an "Off" switch. We skip that value entirely. Zero
-                  is just as important as one!
+                  Represents an "Off" switch. We skip that value entirely.
                 </p>
               </div>
             </div>
-
-            <p class="text-slate-500 mt-8 italic">
-              Next, you will manually flip the switches to rebuild the number
-              13.
-            </p>
           </div>
 
           <div class="mt-12 flex justify-center">
@@ -742,29 +736,61 @@
     </div>
 
     <script>
-      const apiKey = ""; // Set at runtime
+      const apiKey = "";
       let currentStep = 0;
 
-      // Counter State
-      let decVal = 0;
-      let binVal = 0;
-      let interacted = { dec: false, bin: false };
+      // --- Sound Engine ---
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-      // Bit state for hardware step
-      let bits = Array(8).fill(0);
-      const bitValues = [1, 2, 4, 8, 16, 32, 64, 128];
+      const sounds = {
+        click: () => playTone(300, 0.05, "triangle", 0.2),
+        thump: () => playTone(80, 0.1, "sine", 0.5),
+        success: () => {
+          playTone(440, 0.1, "sine", 0.2);
+          setTimeout(() => playTone(880, 0.2, "sine", 0.2), 100);
+        },
+        error: () => {
+          playTone(150, 0.1, "sawtooth", 0.2);
+          setTimeout(() => playTone(120, 0.2, "sawtooth", 0.2), 50);
+        },
+        pop: () => playTone(600, 0.05, "sine", 0.1),
+        swoosh: () => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.frequency.exponentialRampToValueAtTime(
+            10,
+            audioCtx.currentTime + 0.3,
+          );
+          gain.gain.exponentialRampToValueAtTime(
+            0.01,
+            audioCtx.currentTime + 0.3,
+          );
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start();
+          osc.stop(audioCtx.currentTime + 0.3);
+        },
+      };
 
-      const TARGET_NUM = 13;
-      const ALGO_STEPS = [
-        { v: 13, q: 6, r: 1 },
-        { v: 6, q: 3, r: 0 },
-        { v: 3, q: 1, r: 1 },
-        { v: 1, q: 0, r: 1 },
-      ];
-      let completedAlgorithm = [false, false, false, false];
+      function playTone(freq, duration, type, vol) {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(
+          0.01,
+          audioCtx.currentTime + duration,
+        );
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      }
 
       // --- Navigation ---
       function goToStep(num) {
+        sounds.pop();
         currentStep = num;
         document
           .querySelectorAll("section")
@@ -786,8 +812,12 @@
         if (currentStep > 0) goToStep(currentStep - 1);
       }
 
-      // --- Step 2: Counters with Flash Logic ---
+      // --- Counters ---
+      let decVal = 0,
+        binVal = 0,
+        interacted = { dec: false, bin: false };
       function incrementCounter(type) {
+        sounds.click();
         if (type === "dec") {
           decVal++;
           interacted.dec = true;
@@ -804,7 +834,6 @@
         const val = type === "dec" ? decVal : binVal;
         const prefix = type === "dec" ? "d" : "b";
         const count = type === "dec" ? 2 : 4;
-
         let digits = val.toString(base).split("").map(Number);
         while (digits.length < count) digits.unshift(0);
         digits = digits.slice(-count);
@@ -813,10 +842,10 @@
           const pos = count - 1 - i;
           const el = document.getElementById(`${prefix}-pos-${pos}`);
           const prevVal = parseInt(el.innerText);
-
           if (prevVal !== digit) {
             el.innerText = digit;
             if (digit === 0 && prevVal === base - 1) {
+              sounds.thump();
               el.classList.add("rollover-flash");
               setTimeout(() => el.classList.remove("rollover-flash"), 400);
             }
@@ -827,28 +856,26 @@
       function checkStep2Completion() {
         if (interacted.dec && interacted.bin) {
           const btn = document.getElementById("next-btn-2");
+          if (btn.disabled) sounds.success();
           btn.classList.remove("btn-locked", "bg-slate-200", "text-slate-400");
           btn.classList.add("bg-indigo-600", "text-white", "next-btn-anim");
           btn.disabled = false;
-          document.getElementById("counter-status").innerText =
-            "Foundation Mastered";
-          document
-            .getElementById("counter-status")
-            .classList.add("text-indigo-600");
         }
       }
 
-      // --- Step 4: Algorithm ---
+      // --- Algorithm ---
+      const ALGO_STEPS = [
+        { v: 13, q: 6, r: 1 },
+        { v: 6, q: 3, r: 0 },
+        { v: 3, q: 1, r: 1 },
+        { v: 1, q: 0, r: 1 },
+      ];
+      let completedAlgorithm = [false, false, false, false];
+
       function initAlgorithm() {
         const container = document.getElementById("rows-container");
-        const stack = document.getElementById("stack-container");
         if (container.children.length > 0) return;
-
         container.innerHTML = "";
-        stack.innerHTML = "";
-        completedAlgorithm = [false, false, false, false];
-        document.getElementById("binary-final-text").innerText = "????";
-
         ALGO_STEPS.forEach((step, i) => {
           const row = document.createElement("div");
           row.id = `algo-row-${i}`;
@@ -860,19 +887,17 @@
                 <input type="number" id="r-${i}" class="bg-slate-100 p-2 rounded-lg w-full outline-none focus:ring-2 ring-indigo-500" placeholder="?">
             `;
           container.appendChild(row);
-
           const pill = document.createElement("div");
           pill.id = `pill-${i}`;
           pill.className =
             "remainder-pill bg-indigo-600 text-white text-center py-2 rounded-lg font-bold shadow-md";
           pill.innerText = step.r;
-          stack.appendChild(pill);
-
-          const qInput = row.querySelector(`#q-${i}`);
-          const rInput = row.querySelector(`#r-${i}`);
-          [qInput, rInput].forEach((inp) => {
-            inp.addEventListener("input", () => validateStep(i));
-          });
+          document.getElementById("stack-container").appendChild(pill);
+          [row.querySelector(`#q-${i}`), row.querySelector(`#r-${i}`)].forEach(
+            (inp) => {
+              inp.addEventListener("input", () => validateStep(i));
+            },
+          );
         });
       }
 
@@ -880,27 +905,26 @@
         const qVal = document.getElementById(`q-${idx}`).value;
         const rVal = document.getElementById(`r-${idx}`).value;
         if (qVal === "" || rVal === "") return;
-
-        const q = parseInt(qVal);
-        const r = parseInt(rVal);
-        const target = ALGO_STEPS[idx];
+        const q = parseInt(qVal),
+          r = parseInt(rVal),
+          target = ALGO_STEPS[idx];
+        const row = document.getElementById(`algo-row-${idx}`);
 
         if (q === target.q && r === target.r) {
-          document
-            .getElementById(`algo-row-${idx}`)
-            .classList.add("input-success");
-          document
-            .getElementById(`algo-row-${idx}`)
-            .classList.remove("bg-white");
+          if (!completedAlgorithm[idx]) sounds.success();
+          row.classList.add("input-success");
+          row.classList.remove("input-error", "bg-white");
           document.getElementById(`pill-${idx}`).classList.add("visible");
           completedAlgorithm[idx] = true;
-
           if (idx < 3) {
             const next = document.getElementById(`algo-row-${idx + 1}`);
             next.classList.remove("opacity-20", "pointer-events-none");
             next.classList.add("bg-white", "shadow-sm", "border-slate-200");
           }
           updateAlgoStatus();
+        } else if (qVal.length >= 1 && rVal.length >= 1) {
+          sounds.error();
+          row.classList.add("input-error");
         }
       }
 
@@ -909,7 +933,6 @@
         for (let i = 3; i >= 0; i--)
           res += completedAlgorithm[i] ? ALGO_STEPS[i].r : "?";
         document.getElementById("binary-final-text").innerText = res;
-
         if (completedAlgorithm.every((s) => s)) {
           const btn = document.getElementById("next-btn-4");
           btn.classList.remove("btn-locked", "bg-slate-200", "text-slate-400");
@@ -918,41 +941,31 @@
         }
       }
 
-      // --- Step 6: Flipper ---
+      // --- Bit Flipper ---
+      let bits = Array(8).fill(0);
+      const bitValues = [1, 2, 4, 8, 16, 32, 64, 128];
       function initBitFlipper() {
         const container = document.getElementById("bit-container");
         if (container.children.length > 0) return;
-
         container.innerHTML = "";
-        bits = Array(8).fill(0);
-
         bitValues
           .slice()
           .reverse()
           .forEach((val, i) => {
             const realIdx = 7 - i;
             const card = document.createElement("div");
-            card.className = "flex flex-col items-center gap-2";
-            card.innerHTML = `
-                <span class="text-[10px] font-bold text-slate-400">${val}</span>
-                <button onclick="toggleBit(${realIdx})" id="bit-${realIdx}" class="bit-card bit-off w-12 h-16 sm:w-16 sm:h-24 rounded-xl text-2xl font-black border-2">0</button>
-            `;
+            card.innerHTML = `<span class="text-[10px] font-bold text-slate-400">${val}</span><button onclick="toggleBit(${realIdx})" id="bit-${realIdx}" class="bit-card bit-off w-12 h-16 sm:w-16 sm:h-24 rounded-xl text-2xl font-black border-2">0</button>`;
             container.appendChild(card);
           });
-        updateTotal();
       }
 
       function toggleBit(idx) {
+        sounds.click();
         bits[idx] = bits[idx] === 0 ? 1 : 0;
         const btn = document.getElementById(`bit-${idx}`);
         btn.innerText = bits[idx];
-        if (bits[idx] === 1) {
-          btn.classList.add("bit-on");
-          btn.classList.remove("bit-off");
-        } else {
-          btn.classList.add("bit-off");
-          btn.classList.remove("bit-on");
-        }
+        btn.classList.toggle("bit-on");
+        btn.classList.toggle("bit-off");
         updateTotal();
       }
 
@@ -960,9 +973,9 @@
         let total = 0;
         bits.forEach((b, i) => (total += b * bitValues[i]));
         document.getElementById("total-display").innerText = total;
-
         const btn = document.getElementById("next-btn-6");
         if (total === 13) {
+          if (btn.disabled) sounds.success();
           btn.classList.remove("btn-locked", "bg-slate-200", "text-slate-400");
           btn.classList.add("bg-green-600", "text-white", "next-btn-anim");
           btn.disabled = false;
@@ -973,10 +986,11 @@
         }
       }
 
-      // --- Step 7: Sandbox ---
+      // --- Sandbox ---
       function sbConvert(src) {
-        const dec = document.getElementById("sb-dec");
-        const bin = document.getElementById("sb-bin");
+        sounds.pop();
+        const dec = document.getElementById("sb-dec"),
+          bin = document.getElementById("sb-bin");
         if (src === "dec") {
           const val = parseInt(dec.value);
           if (!isNaN(val) && val >= 0 && val <= 255)
@@ -989,11 +1003,10 @@
 
       // --- AI Logic ---
       function toggleAIToolbox() {
-        const box = document.getElementById("ai-toolbox");
-        box.classList.toggle("hidden");
+        sounds.swoosh();
+        document.getElementById("ai-toolbox").classList.toggle("hidden");
       }
 
-      // Enhanced Gemini Call with Exponential Backoff and Proper Error Handling
       async function callGemini(
         prompt,
         systemPrompt = "You are a helpful educational assistant for a binary number learning app.",
@@ -1003,7 +1016,6 @@
           contents: [{ parts: [{ text: prompt }] }],
           systemInstruction: { parts: [{ text: systemPrompt }] },
         };
-
         const maxRetries = 5;
         for (let i = 0; i < maxRetries; i++) {
           try {
@@ -1012,125 +1024,92 @@
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify(payload),
             });
-
             if (!response.ok)
               throw new Error(`HTTP error! status: ${response.status}`);
-
             const result = await response.json();
             const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
-
             if (text) return text;
-            throw new Error("Empty response from AI");
           } catch (error) {
             if (i === maxRetries - 1) throw error;
-            const delay = Math.pow(2, i) * 1000;
-            await new Promise((resolve) => setTimeout(resolve, delay));
+            await new Promise((resolve) =>
+              setTimeout(resolve, Math.pow(2, i) * 1000),
+            );
           }
         }
       }
 
       async function askAI(type) {
-        const display = document.getElementById("ai-response");
-        const realityDisplay = document.getElementById("reality-text");
-
+        sounds.pop();
+        const display = document.getElementById("ai-response"),
+          realityDisplay = document.getElementById("reality-text");
         if (type === "reality-check") {
           realityDisplay.innerText = "Consulting the architect databases...";
           realityDisplay.classList.add("ai-loading-shimmer");
-          const dec = document.getElementById("sb-dec").value || "0";
-          const bin = document.getElementById("sb-bin").value || "00000000";
-          const prompt = `Give me a short, 2-sentence fascinating real-world fact about the decimal number ${dec} or its binary form ${bin}. E.g., is it an ASCII character, a color intensity, or a specific hardware code? Be creative.`;
           try {
-            const text = await callGemini(prompt);
-            realityDisplay.innerText = text;
+            realityDisplay.innerText = await callGemini(
+              `Fascinating real-world fact about decimal ${document.getElementById("sb-dec").value || "0"}. 2 sentences max.`,
+            );
+            sounds.success();
           } catch (e) {
-            realityDisplay.innerText =
-              "Connection failed. Please try again in a moment.";
+            realityDisplay.innerText = "Connection failed.";
+            sounds.error();
           }
           realityDisplay.classList.remove("ai-loading-shimmer");
           return;
         }
-
         display.innerHTML =
           '<div class="h-4 w-full ai-loading-shimmer rounded mb-2"></div><div class="h-4 w-2/3 ai-loading-shimmer rounded"></div>';
-
         try {
           let prompt = "";
           if (type === "explain")
-            prompt =
-              "Explain binary 'rollover' using an analogy of a tiny car odometer that only has 0 and 1. Keep it brief and friendly.";
+            prompt = "Explain binary 'rollover' odometer analogy. Friendly.";
           if (type === "challenge")
             prompt =
-              "Generate a single whole number between 20 and 100. Ask the user to convert it to binary and give them one 'power of 2' hint (like 'It contains a 64').";
+              "Give a number 20-100 to convert to binary. Include a power of 2 hint.";
           if (type === "story")
             prompt =
-              "Tell a 3-sentence story about a robot named 'Bit' who needs to carry the decimal value 13 across a bridge using only binary switches. Make it technical but charming.";
-          if (type === "guide-division") {
-            display.innerText = "Preparing audio tutor...";
+              "Robot named 'Bit' carries decimal 13 across a bridge with binary switches. 3 sentences.";
+          if (type === "guide-division")
             return speakLogic(
               "Tutoring mode: Explain the division steps for number 13 clearly.",
             );
-          }
-          if (type === "tts") {
-            display.innerText = "Narrating overview...";
-            return speakLogic(
-              "Welcome to the Number Architect. Today we learn how binary powers everything from your phone to the biggest supercomputers.",
-            );
-          }
-
-          const text = await callGemini(prompt);
-          display.innerText = text;
+          if (type === "tts")
+            return speakLogic("Welcome to the Number Architect.");
+          display.innerText = await callGemini(prompt);
+          sounds.success();
         } catch (e) {
-          display.innerText =
-            "Unable to reach the Architect AI. Please check your network connection.";
+          display.innerText = "Unable to reach the Architect AI.";
+          sounds.error();
         }
       }
 
       async function speakLogic(customText) {
         const prompt =
           customText || "Explain the concept of binary systems simply.";
-        const maxRetries = 5;
-
-        for (let i = 0; i < maxRetries; i++) {
-          try {
-            const response = await fetch(
-              `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`,
-              {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  contents: [{ parts: [{ text: prompt }] }],
-                  generationConfig: {
-                    responseModalities: ["AUDIO"],
-                    speechConfig: {
-                      voiceConfig: {
-                        prebuiltVoiceConfig: { voiceName: "Puck" },
-                      },
-                    },
+        try {
+          const response = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                contents: [{ parts: [{ text: prompt }] }],
+                generationConfig: {
+                  responseModalities: ["AUDIO"],
+                  speechConfig: {
+                    voiceConfig: { prebuiltVoiceConfig: { voiceName: "Puck" } },
                   },
-                  model: "gemini-2.5-flash-preview-tts",
-                }),
-              },
-            );
-
-            if (!response.ok) throw new Error("TTS failed");
-
-            const data = await response.json();
-            const pcmData =
-              data.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
-            if (pcmData) {
-              playAudio(pcmData);
-              return;
-            }
-            throw new Error("No audio data");
-          } catch (e) {
-            if (i === maxRetries - 1) {
-              document.getElementById("ai-response").innerText =
-                "Voice system currently unavailable.";
-              return;
-            }
-            const delay = Math.pow(2, i) * 1000;
-            await new Promise((resolve) => setTimeout(resolve, delay));
-          }
+                },
+                model: "gemini-2.5-flash-preview-tts",
+              }),
+            },
+          );
+          const data = await response.json();
+          const pcmData =
+            data.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+          if (pcmData) playAudio(pcmData);
+        } catch (e) {
+          console.error(e);
         }
       }
 
@@ -1139,11 +1118,9 @@
         const bytes = new Uint8Array(binaryString.length);
         for (let i = 0; i < binaryString.length; i++)
           bytes[i] = binaryString.charCodeAt(i);
-
         const wavHeader = createWavHeader(bytes.length, 24000);
         const blob = new Blob([wavHeader, bytes], { type: "audio/wav" });
-        const url = URL.createObjectURL(blob);
-        const audio = new Audio(url);
+        const audio = new Audio(URL.createObjectURL(blob));
         audio.play();
       }
 
