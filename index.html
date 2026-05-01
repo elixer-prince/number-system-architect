@@ -6,6 +6,15 @@
     <title>Number System Architect: Interactive Lesson</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&family=Fira+Code:wght@400;700&display=swap");
+
+      body {
+        font-family: "Inter", sans-serif;
+      }
+      .mono {
+        font-family: "Fira Code", monospace;
+      }
+
       .bit-card {
         transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       }
@@ -35,6 +44,17 @@
         animation: pulse-soft 2s infinite;
       }
 
+      .binary-bg {
+        font-family: "Fira Code", monospace;
+        mask-image: linear-gradient(to bottom, black, transparent);
+        user-select: none;
+      }
+      .btn-locked {
+        opacity: 0.5;
+        cursor: not-allowed;
+        filter: grayscale(1);
+      }
+
       .remainder-pill {
         transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         transform: scale(0);
@@ -45,460 +65,95 @@
         opacity: 1;
       }
 
-      .input-error {
-        border: 2px solid #ef4444 !important;
-        background-color: #fef2f2 !important;
-        animation: shake 0.3s ease-in-out;
-      }
-      @keyframes shake {
-        0%,
-        100% {
-          transform: translateX(0);
-        }
-        25% {
-          transform: translateX(-4px);
-        }
-        75% {
-          transform: translateX(4px);
-        }
-      }
-      .input-success {
-        border: 2px solid #22c55e !important;
-        background-color: #f0fdf4 !important;
+      .row-active {
+        border-left: 4px solid #6366f1;
+        padding-left: 12px;
+        background: rgba(99, 102, 241, 0.05);
       }
 
-      .page-transition {
-        animation: fadeIn 0.4s ease-out;
+      .definition-card {
+        border-left: 4px solid #6366f1;
       }
-      @keyframes fadeIn {
+
+      .video-container {
+        position: relative;
+        padding-bottom: 56.25%;
+        height: 0;
+        overflow: hidden;
+        border-radius: 1.5rem;
+      }
+      .video-container iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+
+      .instruction-step {
+        @apply flex items-center gap-4 p-4 bg-slate-50 rounded-xl border border-slate-200 mb-4;
+      }
+      .step-circle {
+        @apply w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold flex-shrink-0;
+      }
+
+      .method-card {
+        @apply p-8 rounded-[2rem] border-2 transition-all cursor-pointer hover:shadow-xl;
+      }
+
+      .quiz-card {
+        @apply bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-xl transition-all relative overflow-hidden;
+      }
+      .quiz-card.correct-feedback {
+        @apply border-emerald-500 bg-emerald-50;
+      }
+      .quiz-card.incorrect-feedback {
+        @apply border-red-500 bg-red-50;
+      }
+
+      .hint-box {
+        @apply text-sm text-indigo-700 bg-indigo-50 p-4 rounded-2xl mt-4 border border-indigo-100 hidden animate-in slide-in-from-top-2;
+      }
+
+      .progress-segment {
+        @apply h-2 flex-1 rounded-full bg-slate-100 transition-all duration-500;
+      }
+      .progress-segment.active {
+        @apply bg-indigo-500;
+      }
+      .progress-segment.completed {
+        @apply bg-emerald-500;
+      }
+
+      .nav-unlocked {
+        animation: slideDown 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+      }
+      @keyframes slideDown {
         from {
+          transform: translateY(-20px);
           opacity: 0;
-          transform: translateY(10px);
         }
         to {
-          opacity: 1;
           transform: translateY(0);
-        }
-      }
-
-      .rollover-flash {
-        animation: flashRed 0.4s ease-in-out;
-      }
-      @keyframes flashRed {
-        0%,
-        100% {
-          background-color: transparent;
-        }
-        50% {
-          background-color: #fee2e2;
-          color: #ef4444;
-        }
-      }
-
-      .digit-box {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 1rem;
-        transition: all 0.2s;
-      }
-
-      .ai-loading-shimmer {
-        background: linear-gradient(
-          90deg,
-          #f1f5f9 25%,
-          #e2e8f0 50%,
-          #f1f5f9 75%
-        );
-        background-size: 200% 100%;
-        animation: loading-shimmer 1.5s infinite;
-      }
-      @keyframes loading-shimmer {
-        0% {
-          background-position: 200% 0;
-        }
-        100% {
-          background-position: -200% 0;
+          opacity: 1;
         }
       }
     </style>
   </head>
-  <body class="bg-slate-50 min-h-screen text-slate-800 font-sans pb-10">
-    <!-- Persistent Header -->
+  <body class="bg-slate-50 min-h-screen text-slate-800 pb-20">
     <header
       id="main-header"
-      class="hidden bg-white/80 backdrop-blur-md border-b sticky top-0 z-40 py-4 px-6"
+      class="hidden bg-white/80 backdrop-blur-md border-b border-slate-200 py-4 px-6 sticky top-0 z-50"
     >
-      <div class="max-w-5xl mx-auto flex justify-between items-center">
-        <div class="flex items-center gap-4">
-          <button
-            onclick="goBack()"
-            class="p-2 hover:bg-slate-100 rounded-full transition-colors"
-          >
-            <svg
-              class="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-          </button>
-          <h1 class="font-bold text-slate-900 tracking-tight">
-            Number Architect
-          </h1>
-        </div>
-        <div class="flex items-center gap-4">
-          <button
-            onclick="toggleAIToolbox()"
-            class="text-xs font-bold bg-indigo-50 text-indigo-600 px-3 py-1.5 rounded-full border border-indigo-100 hover:bg-indigo-100 transition-colors"
-          >
-            ✨ Architect AI
-          </button>
-          <div class="h-6 w-px bg-slate-200"></div>
-          <span class="text-xs font-mono text-slate-400"
-            >Step <span id="current-step-num">0</span>/7</span
-          >
-        </div>
-      </div>
-    </header>
-
-    <main class="max-w-5xl mx-auto px-4 pt-8">
-      <!-- STEP 0: LANDING -->
-      <section
-        id="step-0"
-        class="page-transition min-h-[80vh] flex flex-col items-center justify-center text-center space-y-8"
-      >
-        <div class="space-y-4">
-          <h1 class="text-8xl font-black tracking-tighter text-slate-900">
-            ARCHITECT
-          </h1>
-          <p class="text-xl text-slate-500 max-w-md mx-auto">
-            Master the digital language of computers through structural logic.
-          </p>
-        </div>
-        <button
-          onclick="goToStep(1)"
-          class="bg-slate-900 text-white px-12 py-5 rounded-2xl font-bold text-xl shadow-xl hover:scale-105 active:scale-95 transition-all"
-        >
-          Begin Journey →
-        </button>
-      </section>
-
-      <!-- STEP 1: THE FOUNDATIONS -->
-      <section
-        id="step-1"
-        class="page-transition hidden max-w-3xl mx-auto space-y-8"
-      >
-        <div
-          class="bg-white p-12 rounded-[3rem] shadow-sm border border-slate-200"
-        >
-          <div class="space-y-12">
-            <div class="space-y-4 text-center">
-              <span
-                class="text-xs font-bold text-indigo-600 uppercase tracking-widest bg-indigo-50 px-4 py-1 rounded-full"
-                >Foundation I</span
-              >
-              <h2 class="text-4xl font-black text-slate-900">
-                What is the Decimal system?
-              </h2>
-              <p class="text-xl text-slate-600 leading-relaxed">
-                The <strong>Decimal</strong> system (also called Base-10) uses
-                ten symbols:
-                <span
-                  class="font-mono text-indigo-600 bg-slate-100 px-2 rounded"
-                  >0-9</span
-                >. It's the system we use every day because we have ten fingers.
-              </p>
-            </div>
-
-            <div class="h-px bg-slate-100 w-1/2 mx-auto"></div>
-
-            <div class="space-y-4 text-center">
-              <span
-                class="text-xs font-bold text-blue-600 uppercase tracking-widest bg-blue-50 px-4 py-1 rounded-full"
-                >Foundation II</span
-              >
-              <h2 class="text-4xl font-black text-slate-900">
-                What is the Binary system?
-              </h2>
-              <p class="text-xl text-slate-600 leading-relaxed">
-                The <strong>Binary</strong> system (also called Base-2) uses
-                only two symbols:
-                <span class="font-mono text-blue-600 bg-slate-100 px-2 rounded"
-                  >0 and 1</span
-                >. It is the fundamental language of computers, representing
-                "Off" and "On" states.
-              </p>
-            </div>
-          </div>
-
-          <div class="mt-16 flex justify-center">
+      <div class="max-w-5xl mx-auto flex flex-col gap-3">
+        <div class="flex justify-between items-center w-full">
+          <div class="flex items-center gap-4">
             <button
-              onclick="goToStep(2)"
-              class="next-btn-anim bg-slate-900 text-white px-12 py-4 rounded-full font-bold shadow-lg"
+              onclick="goBack()"
+              class="p-2 hover:bg-slate-100 rounded-xl transition-colors text-slate-500"
             >
-              Understood. Continue →
-            </button>
-          </div>
-        </div>
-      </section>
-
-      <!-- STEP 2: THE COUNTERS -->
-      <section id="step-2" class="page-transition hidden space-y-8">
-        <div
-          class="bg-white p-10 rounded-[3rem] shadow-sm border border-slate-200"
-        >
-          <div class="text-center mb-10">
-            <h2 class="text-3xl font-black">Comparing Rollovers</h2>
-            <p class="text-slate-600 max-w-xl mx-auto">
-              When a column hits its limit, it "rolls over" to zero and carries
-              the value to the next column. Watch how binary triggers this much
-              more frequently.
-            </p>
-          </div>
-
-          <div class="grid md:grid-cols-2 gap-8">
-            <!-- Decimal Counter -->
-            <div
-              class="bg-slate-900 p-8 rounded-[2.5rem] text-center shadow-xl"
-            >
-              <div
-                class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4"
-              >
-                Base-10 (0-9)
-              </div>
-              <div id="dec-digits" class="flex justify-center gap-2 mb-8">
-                <div
-                  id="d-pos-1"
-                  class="digit-box w-20 h-28 bg-slate-800 text-white text-6xl font-black border border-slate-700"
-                >
-                  0
-                </div>
-                <div
-                  id="d-pos-0"
-                  class="digit-box w-20 h-28 bg-slate-800 text-white text-6xl font-black border border-slate-700"
-                >
-                  0
-                </div>
-              </div>
-              <button
-                onclick="incrementCounter('dec')"
-                class="w-full bg-white text-slate-900 py-4 rounded-2xl text-xl font-bold transition-all hover:bg-slate-200 active:scale-95"
-              >
-                Add 1
-              </button>
-            </div>
-
-            <!-- Binary Counter -->
-            <div
-              class="bg-indigo-900 p-8 rounded-[2.5rem] text-center shadow-xl"
-            >
-              <div
-                class="text-xs font-bold text-indigo-300 uppercase tracking-widest mb-4"
-              >
-                Base-2 (0-1)
-              </div>
-              <div id="bin-digits" class="flex justify-center gap-2 mb-8">
-                <div
-                  id="b-pos-3"
-                  class="digit-box w-16 h-28 bg-indigo-950 text-indigo-400 text-6xl font-black border border-indigo-800"
-                >
-                  0
-                </div>
-                <div
-                  id="b-pos-2"
-                  class="digit-box w-16 h-28 bg-indigo-950 text-indigo-400 text-6xl font-black border border-indigo-800"
-                >
-                  0
-                </div>
-                <div
-                  id="b-pos-1"
-                  class="digit-box w-16 h-28 bg-indigo-950 text-indigo-400 text-6xl font-black border border-indigo-800"
-                >
-                  0
-                </div>
-                <div
-                  id="b-pos-0"
-                  class="digit-box w-16 h-28 bg-indigo-950 text-indigo-400 text-6xl font-black border border-indigo-800"
-                >
-                  0
-                </div>
-              </div>
-              <button
-                onclick="incrementCounter('bin')"
-                class="w-full bg-indigo-500 text-white py-4 rounded-2xl text-xl font-bold transition-all hover:bg-indigo-400 active:scale-95 shadow-lg shadow-indigo-500/20"
-              >
-                Add 1
-              </button>
-            </div>
-          </div>
-
-          <div class="mt-10 flex flex-col items-center gap-4 border-t pt-8">
-            <p
-              id="counter-status"
-              class="text-sm font-medium text-slate-400 uppercase tracking-tighter"
-            >
-              Interact with both counters to unlock
-            </p>
-            <button
-              id="next-btn-2"
-              onclick="goToStep(3)"
-              class="btn-locked bg-slate-200 text-slate-400 px-10 py-4 rounded-full font-bold"
-              disabled
-            >
-              The Conversion Secret →
-            </button>
-          </div>
-        </div>
-      </section>
-
-      <!-- STEP 3: THE CONVERSION LOGIC EXPLANATION -->
-      <section id="step-3" class="page-transition hidden space-y-8">
-        <div
-          class="bg-white p-12 rounded-[3.5rem] shadow-sm border border-slate-200"
-        >
-          <div class="max-w-3xl mx-auto space-y-10">
-            <div class="text-center space-y-4">
-              <span
-                class="text-xs font-bold text-emerald-600 uppercase tracking-widest bg-emerald-50 px-4 py-1 rounded-full"
-                >The Algorithm</span
-              >
-              <h2 class="text-4xl font-black text-slate-900">
-                How do we convert?
-              </h2>
-              <p class="text-xl text-slate-600 leading-relaxed">
-                To find the binary version of a decimal number, we use the
-                <strong>Repeated Division Method</strong>.
-              </p>
-            </div>
-
-            <div class="grid md:grid-cols-3 gap-6 text-center">
-              <div class="p-6 bg-slate-50 rounded-3xl border border-slate-100">
-                <div
-                  class="w-10 h-10 bg-slate-900 text-white rounded-full flex items-center justify-center font-bold mx-auto mb-4"
-                >
-                  1
-                </div>
-                <p class="text-sm font-bold text-slate-800 mb-2">Divide by 2</p>
-                <p class="text-xs text-slate-500">
-                  Take your number and split it in half. Binary is Base-2, so we
-                  always use 2.
-                </p>
-              </div>
-              <div class="p-6 bg-slate-50 rounded-3xl border border-slate-100">
-                <div
-                  class="w-10 h-10 bg-slate-900 text-white rounded-full flex items-center justify-center font-bold mx-auto mb-4"
-                >
-                  2
-                </div>
-                <p class="text-sm font-bold text-slate-800 mb-2">
-                  Watch the Remainder
-                </p>
-                <p class="text-xs text-slate-500">
-                  Is there a leftover? That remainder (0 or 1) is your actual
-                  binary digit!
-                </p>
-              </div>
-              <div class="p-6 bg-slate-50 rounded-3xl border border-slate-100">
-                <div
-                  class="w-10 h-10 bg-slate-900 text-white rounded-full flex items-center justify-center font-bold mx-auto mb-4"
-                >
-                  3
-                </div>
-                <p class="text-sm font-bold text-slate-800 mb-2">Repeat</p>
-                <p class="text-xs text-slate-500">
-                  Keep dividing the result until you hit zero. The digits are
-                  read from bottom to top.
-                </p>
-              </div>
-            </div>
-
-            <div class="flex justify-center pt-6">
-              <button
-                onclick="goToStep(4)"
-                class="next-btn-anim bg-slate-900 text-white px-12 py-4 rounded-full font-bold shadow-lg"
-              >
-                Try the Algorithm →
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- STEP 4: THE ALGORITHM (Table) -->
-      <section id="step-4" class="page-transition hidden space-y-8">
-        <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-200">
-          <div class="mb-8 flex justify-between items-center">
-            <div>
-              <h2 class="text-3xl font-black">Division Logic: 13 → Binary</h2>
-              <p class="text-slate-500 text-sm italic">
-                Divide by 2 repeatedly until you reach 0.
-              </p>
-            </div>
-            <button
-              onclick="askAI('guide-division')"
-              class="bg-indigo-50 text-indigo-600 px-4 py-2 rounded-xl text-xs font-bold border border-indigo-100 hover:bg-indigo-100 transition-all flex items-center gap-2"
-            >
-              ✨ Audio Guide
-            </button>
-          </div>
-
-          <div class="grid lg:grid-cols-2 gap-10">
-            <div class="space-y-4 bg-slate-50 p-6 rounded-2xl border">
-              <div
-                class="grid grid-cols-4 gap-2 text-[10px] font-bold text-slate-400 uppercase mb-2"
-              >
-                <div>Value</div>
-                <div>÷ 2</div>
-                <div>Quotient</div>
-                <div>Remainder</div>
-              </div>
-              <div id="rows-container" class="space-y-3"></div>
-            </div>
-            <div
-              class="flex flex-col items-center justify-center bg-white border-2 border-dashed border-slate-200 rounded-3xl p-8"
-            >
-              <div
-                id="stack-container"
-                class="flex flex-col-reverse gap-2 mb-8 w-full max-w-[150px]"
-              ></div>
-              <div
-                id="binary-final-text"
-                class="text-5xl font-black tracking-widest text-indigo-600"
-              >
-                ????
-              </div>
-            </div>
-          </div>
-
-          <div class="mt-8 flex justify-center border-t pt-8">
-            <button
-              id="next-btn-4"
-              onclick="goToStep(5)"
-              class="btn-locked bg-slate-200 text-slate-400 px-10 py-4 rounded-full font-bold"
-              disabled
-            >
-              Transition to Hardware →
-            </button>
-          </div>
-        </div>
-      </section>
-
-      <!-- STEP 5: HARDWARE PREP -->
-      <section id="step-5" class="page-transition hidden space-y-8">
-        <div
-          class="bg-white p-12 rounded-[3.5rem] shadow-sm border border-slate-200 text-center"
-        >
-          <div class="max-w-2xl mx-auto space-y-6">
-            <div class="inline-block p-4 bg-amber-50 rounded-full mb-4">
               <svg
-                class="w-12 h-12 text-amber-500"
+                class="w-5 h-5"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -507,644 +162,1024 @@
                   stroke-linecap="round"
                   stroke-linejoin="round"
                   stroke-width="2"
-                  d="M13 10V3L4 14h7v7l9-11h-7z"
+                  d="M15 19l-7-7 7-7"
                 />
               </svg>
-            </div>
-            <h2 class="text-4xl font-black text-slate-900">
-              Moving to the Machine
-            </h2>
-            <p class="text-xl text-slate-600 leading-relaxed">
-              You've just found the sequence:
-              <span
-                class="font-mono font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded"
-                >1101</span
-              >.
-            </p>
-
-            <div class="grid grid-cols-2 gap-4 mt-8">
-              <div class="p-6 bg-slate-50 rounded-3xl border border-slate-100">
-                <h3 class="font-bold text-lg mb-2">The "1" (High)</h3>
-                <p class="text-sm text-slate-500">
-                  Represents an "On" switch, allowing electricity to flow.
-                </p>
-              </div>
-              <div class="p-6 bg-slate-50 rounded-3xl border border-slate-100">
-                <h3 class="font-bold text-lg mb-2">The "0" (Low)</h3>
-                <p class="text-sm text-slate-500">
-                  Represents an "Off" switch. We skip that value entirely.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div class="mt-12 flex justify-center">
-            <button
-              onclick="goToStep(6)"
-              class="next-btn-anim bg-slate-900 text-white px-12 py-4 rounded-full font-bold shadow-lg"
-            >
-              Enter Hardware Room →
             </button>
+            <h1 class="font-black text-slate-900 tracking-tight">
+              NUMBER <span class="text-indigo-600">ARCHITECT</span>
+            </h1>
+          </div>
+          <div class="flex items-center gap-6">
+            <div
+              id="status-badge"
+              class="hidden items-center gap-2 bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest"
+            >
+              <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                  fill-rule="evenodd"
+                  d="M2.166 4.9L9.03 9.125a2.483 2.483 0 002.14 0l6.864-4.225A2.466 2.483 0 0015.5 2h-11a2.466 2.483 0 00-2.334 2.9zM2 7.183V15.5a2.484 2.484 0 002.484 2.5h11.032A2.484 2.484 0 0018 15.5V7.183l-7.03 4.323a1.485 1.485 0 01-1.94 0L2 7.183z"
+                />
+              </svg>
+              Architect Certified
+            </div>
+            <div class="hidden md:flex gap-1">
+              <div id="dot-0-1" class="w-2 h-2 rounded-full bg-slate-200"></div>
+              <div id="dot-0-5" class="w-2 h-2 rounded-full bg-slate-200"></div>
+              <div id="dot-1" class="w-2 h-2 rounded-full bg-slate-200"></div>
+              <div id="dot-2" class="w-2 h-2 rounded-full bg-slate-200"></div>
+              <div id="dot-2-5" class="w-2 h-2 rounded-full bg-slate-200"></div>
+              <div id="dot-3" class="w-2 h-2 rounded-full bg-slate-200"></div>
+              <div id="dot-4" class="w-2 h-2 rounded-full bg-slate-200"></div>
+              <div id="dot-4-5" class="w-2 h-2 rounded-full bg-slate-200"></div>
+              <div id="dot-5" class="w-2 h-2 rounded-full bg-slate-200"></div>
+            </div>
+            <span
+              class="text-[10px] font-bold text-slate-400 uppercase tracking-widest"
+              >Phase <span id="current-step-num">0.1</span></span
+            >
           </div>
         </div>
-      </section>
 
-      <!-- STEP 6: BIT FLIPPER -->
-      <section id="step-6" class="page-transition hidden space-y-8">
+        <!-- MASTER NAVIGATION (UNLOCKED AT END) -->
         <div
-          class="bg-white p-12 rounded-[3.5rem] shadow-sm border border-slate-200"
+          id="master-nav"
+          class="hidden border-t border-slate-100 pt-3 nav-unlocked overflow-x-auto whitespace-nowrap pb-1"
         >
-          <div class="text-center mb-10">
-            <h2 class="text-3xl font-black">Hardware Verification</h2>
-            <p class="text-slate-500">
-              Flip the physical switches to recreate the decimal value 13.
-            </p>
-          </div>
           <div
-            id="bit-container"
-            class="flex flex-wrap justify-center gap-4 mb-12"
-          ></div>
-          <div
-            class="max-w-md mx-auto bg-slate-900 text-white p-10 rounded-[2.5rem] text-center shadow-xl"
+            class="flex gap-2 text-[10px] font-bold uppercase tracking-wider text-slate-400"
           >
-            <div
-              class="text-xs font-bold text-indigo-400 uppercase tracking-widest mb-2"
-            >
-              Calculated Value
-            </div>
-            <div id="total-display" class="text-8xl font-black">0</div>
-          </div>
-          <div class="mt-12 flex justify-center">
             <button
-              id="next-btn-6"
-              onclick="goToStep(7)"
-              class="btn-locked bg-slate-200 text-slate-400 px-12 py-4 rounded-full font-bold"
-              disabled
+              onclick="goToStep(1)"
+              class="px-3 py-2 bg-slate-50 hover:bg-indigo-600 hover:text-white rounded-lg transition-all border border-slate-100"
             >
-              Confirm value 13 →
+              Phase 1
+            </button>
+            <button
+              onclick="goToStep(2)"
+              class="px-3 py-2 bg-slate-50 hover:bg-indigo-600 hover:text-white rounded-lg transition-all border border-slate-100"
+            >
+              Phase 2
+            </button>
+            <button
+              onclick="goToStep(2.5)"
+              class="px-3 py-2 bg-slate-50 hover:bg-indigo-600 hover:text-white rounded-lg transition-all border border-slate-100"
+            >
+              Overview
+            </button>
+            <button
+              onclick="goToStep(3)"
+              class="px-3 py-2 bg-slate-50 hover:bg-indigo-600 hover:text-white rounded-lg transition-all border border-slate-100"
+            >
+              Division Lab
+            </button>
+            <button
+              onclick="goToStep(4)"
+              class="px-3 py-2 bg-slate-50 hover:bg-indigo-600 hover:text-white rounded-lg transition-all border border-slate-100"
+            >
+              Positional Lab
+            </button>
+            <button
+              onclick="goToStep(4.5)"
+              class="px-3 py-2 bg-slate-50 hover:bg-indigo-600 hover:text-white rounded-lg transition-all border border-slate-100"
+            >
+              Quiz
+            </button>
+            <button
+              onclick="goToStep(5)"
+              class="px-3 py-2 bg-indigo-50 text-indigo-700 hover:bg-indigo-600 hover:text-white rounded-lg transition-all border border-indigo-100"
+            >
+              Sandbox
             </button>
           </div>
         </div>
+      </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-4 mt-8">
+      <!-- STEP 0: LANDING -->
+      <section
+        id="step-0"
+        class="lesson-step min-h-[85vh] flex flex-col items-center justify-center text-center space-y-12"
+      >
+        <div
+          class="absolute inset-0 overflow-hidden binary-bg opacity-[0.03] pointer-events-none text-xl leading-relaxed p-12"
+        >
+          01001000 01101001 00100000 01001000 01110101 01101101 01100001
+          01101110 01011111
+        </div>
+
+        <div
+          class="bg-indigo-50 border border-indigo-200 p-4 rounded-xl text-sm max-w-lg mx-auto z-10"
+        >
+          <strong>Objective:</strong> By the end of the lesson, you will
+          accurately convert decimal numbers (0–255) into binary using both the
+          division and positional methods with at least 80% accuracy.
+        </div>
+
+        <div class="relative z-10 space-y-6">
+          <h1
+            class="text-6xl md:text-8xl font-black tracking-tighter text-slate-900 leading-none"
+          >
+            THINK IN <br /><span
+              class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-blue-500"
+              >BINARY</span
+            >
+          </h1>
+          <p class="text-xl text-slate-500 max-w-xl mx-auto font-medium">
+            Master the conversion from human numbers to digital reality.
+          </p>
+        </div>
+        <button
+          onclick="goToStep(0.1)"
+          class="next-btn-anim bg-slate-900 text-white px-12 py-5 rounded-2xl font-extrabold text-xl shadow-2xl hover:bg-slate-800 transition-all z-10"
+        >
+          Initialize Learning
+        </button>
       </section>
 
-      <!-- STEP 7: SANDBOX -->
-      <section id="step-7" class="page-transition hidden">
-        <div class="bg-slate-900 text-white p-12 rounded-[3.5rem] shadow-2xl">
-          <div class="text-center mb-12">
-            <h2 class="text-5xl font-black">Sandbox Architect</h2>
-            <p class="text-slate-400 mt-4">
-              Convert any number between 0 and 255.
+      <!-- STEP 0.1: MISSION -->
+      <section
+        id="step-0.1"
+        class="lesson-step hidden space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500"
+      >
+        <div
+          class="bg-white p-12 rounded-[2.5rem] shadow-sm border border-slate-200 text-center"
+        >
+          <h2 class="text-4xl font-black text-slate-900 mb-6">Your Mission</h2>
+          <div
+            class="bg-indigo-50 border border-indigo-200 p-8 rounded-[2rem] text-left max-w-2xl mx-auto"
+          >
+            <p class="text-lg text-indigo-900 font-bold">
+              By the end of the lesson, you will accurately convert decimal
+              numbers (0–255) into binary using both the
+              <b>Division Method</b> and the <b>Positional Method</b> with at
+              least 80% accuracy.
             </p>
           </div>
-          <div class="grid sm:grid-cols-2 gap-8 max-w-2xl mx-auto">
-            <div class="space-y-2">
-              <label class="text-xs font-bold text-slate-500 uppercase"
-                >Decimal</label
+          <button
+            onclick="goToStep(0.5)"
+            class="mt-8 bg-indigo-600 text-white px-12 py-4 rounded-full font-bold"
+          >
+            Accept Mission →
+          </button>
+        </div>
+      </section>
+
+      <!-- STEP 0.5: INTRO VIDEO -->
+      <section id="step-0.5" class="lesson-step hidden space-y-8">
+        <div class="bg-white p-10 rounded-[2.5rem] border border-slate-200">
+          <h2 class="text-3xl font-black mb-8">Visual Introduction</h2>
+          <div class="video-container shadow-2xl">
+            <iframe
+              src="https://www.youtube.com/embed/LpuPe81bc2w"
+              frameborder="0"
+              allowfullscreen
+            ></iframe>
+          </div>
+          <button
+            onclick="goToStep(1)"
+            class="mt-10 mx-auto block bg-indigo-600 text-white px-12 py-4 rounded-full font-bold"
+          >
+            Start Learning →
+          </button>
+        </div>
+      </section>
+
+      <!-- STEP 1: CONCEPTS -->
+      <section id="step-1" class="lesson-step hidden space-y-8">
+        <div class="bg-white p-10 rounded-[2.5rem] border border-slate-200">
+          <h2 class="text-3xl font-black mb-6">Phase 1: The Blueprint</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="space-y-6">
+              <div class="definition-card p-6 bg-slate-50 rounded-r-2xl">
+                <h3
+                  class="font-bold text-indigo-600 uppercase text-xs tracking-widest mb-2"
+                >
+                  Base-10 (Decimal)
+                </h3>
+                <p class="text-slate-600 text-sm leading-relaxed">
+                  The system humans use. It has <b>10 digits</b> (0-9). Every
+                  time you hit 10, you roll over to a new column (Ones, Tens,
+                  Hundreds).
+                </p>
+              </div>
+              <div
+                class="definition-card p-6 bg-slate-50 rounded-r-2xl border-blue-500"
               >
-              <input
-                type="number"
-                id="sb-dec"
-                oninput="sbConvert('dec')"
-                placeholder="255"
-                class="w-full bg-slate-800 border-2 border-slate-700 p-6 rounded-3xl text-3xl text-center outline-none focus:border-indigo-500 transition-all"
-              />
+                <h3
+                  class="font-bold text-blue-600 uppercase text-xs tracking-widest mb-2"
+                >
+                  Base-2 (Binary)
+                </h3>
+                <p class="text-slate-600 text-sm leading-relaxed">
+                  The system computers use. It has only <b>2 digits</b> (0 and
+                  1). Every time you hit 2, you roll over. Columns are powers of
+                  2 (1, 2, 4, 8, 16...).
+                </p>
+              </div>
+              <div
+                class="definition-card p-6 bg-slate-50 rounded-r-2xl border-amber-500"
+              >
+                <h3
+                  class="font-bold text-amber-600 uppercase text-xs tracking-widest mb-2"
+                >
+                  What is a Bit?
+                </h3>
+                <p class="text-slate-600 text-sm leading-relaxed">
+                  Short for <b>BInary digiT</b>. It is the smallest unit of data
+                  in computing, representing a single 0 or 1.
+                </p>
+              </div>
             </div>
-            <div class="space-y-2">
-              <label class="text-xs font-bold text-slate-500 uppercase"
-                >Binary</label
+            <!-- MULTI-COUNTER DISPLAY -->
+            <div
+              class="bg-indigo-900 rounded-[2rem] p-8 text-white flex flex-col items-center justify-center shadow-xl"
+            >
+              <div class="flex w-full gap-4 mb-8">
+                <div class="flex-1 text-center">
+                  <div
+                    class="text-[10px] font-bold text-indigo-300 uppercase tracking-widest mb-2"
+                  >
+                    Decimal
+                  </div>
+                  <div
+                    id="dec-display"
+                    class="text-7xl md:text-8xl font-black tabular-nums"
+                  >
+                    0
+                  </div>
+                </div>
+                <div class="w-px bg-indigo-800 self-stretch"></div>
+                <div class="flex-1 text-center">
+                  <div
+                    class="text-[10px] font-bold text-blue-300 uppercase tracking-widest mb-2"
+                  >
+                    Binary
+                  </div>
+                  <div
+                    id="bin-display"
+                    class="text-7xl md:text-8xl font-black tabular-nums mono tracking-tighter"
+                  >
+                    0000
+                  </div>
+                </div>
+              </div>
+              <button
+                onclick="countDecimal()"
+                class="w-full bg-white text-indigo-900 py-5 rounded-2xl text-xl font-black hover:bg-indigo-50 transition-all active:scale-95"
               >
-              <input
-                type="text"
-                id="sb-bin"
-                oninput="sbConvert('bin')"
-                placeholder="11111111"
-                class="w-full bg-slate-800 border-2 border-slate-700 p-6 rounded-3xl text-3xl text-center font-mono outline-none focus:border-indigo-500 transition-all"
-              />
+                Count to 10
+              </button>
+            </div>
+          </div>
+          <button
+            id="next-btn-1"
+            onclick="goToStep(2)"
+            class="btn-locked mt-12 block mx-auto bg-indigo-600 text-white px-12 py-4 rounded-full font-bold transition-all"
+            disabled
+          >
+            Unlock Phase 2 →
+          </button>
+        </div>
+      </section>
+
+      <!-- STEP 2: POSITIONAL -->
+      <section id="step-2" class="lesson-step hidden">
+        <div class="bg-white p-10 rounded-[2.5rem] border border-slate-200">
+          <div class="flex justify-between items-center mb-8">
+            <h2 class="text-3xl font-black">Phase 2: Values</h2>
+            <div class="flex flex-col items-end">
+              <span
+                class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1"
+                >Total Decimal Value</span
+              >
+              <div
+                class="bg-slate-900 text-white px-8 py-4 rounded-2xl text-5xl font-black"
+                id="phase2-sum"
+              >
+                0
+              </div>
             </div>
           </div>
 
-          <!-- ✨ GEMINI INTEGRATION: REALITY CHECK -->
-          <div class="mt-12 max-w-2xl mx-auto">
-            <div
-              class="bg-slate-800/50 border border-slate-700 p-8 rounded-[2.5rem]"
-            >
-              <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-bold flex items-center gap-2">
-                  ✨ Reality Check
-                </h3>
-                <button
-                  onclick="askAI('reality-check')"
-                  class="text-xs bg-indigo-600 px-3 py-1.5 rounded-full hover:bg-indigo-500 transition-colors"
-                >
-                  Generate Context
-                </button>
-              </div>
-              <p
-                id="reality-text"
-                class="text-sm text-slate-400 leading-relaxed italic"
+          <div
+            class="bg-slate-50 border border-slate-200 p-6 rounded-2xl mb-10 text-sm leading-relaxed text-slate-600"
+          >
+            <h3 class="font-bold text-slate-900 mb-2 flex items-center gap-2">
+              <svg
+                class="w-4 h-4 text-indigo-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
               >
-                Type a number above and click Generate to see how computers use
-                that specific binary pattern in the real world.
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              What's happening here?
+            </h3>
+            <p>
+              In binary, each position represents a <strong>Power of 2</strong>.
+              Starting from the right, the values are 1, 2, 4, 8, and so on.
+              When a switch is "1" (On), its value is added to the total. When
+              it's "0" (Off), it contributes zero. By combining these specific
+              "weights," we can represent any whole number!
+            </p>
+          </div>
+
+          <div
+            id="p2-bit-container"
+            class="flex flex-row-reverse justify-between gap-3 mb-10"
+          ></div>
+          <p class="text-center text-indigo-600 font-bold mb-8 italic">
+            Challenge: Set switches to make exactly 23
+          </p>
+          <button
+            id="next-btn-2"
+            onclick="goToStep(2.5)"
+            class="btn-locked block mx-auto bg-indigo-600 text-white px-12 py-4 rounded-full font-bold"
+            disabled
+          >
+            Next Topic →
+          </button>
+        </div>
+      </section>
+
+      <!-- STEP 2.5: TOPIC OVERVIEW -->
+      <section
+        id="step-2.5"
+        class="lesson-step hidden space-y-8 animate-in fade-in duration-500"
+      >
+        <div
+          class="bg-white p-10 md:p-16 rounded-[3rem] border border-slate-200 text-center"
+        >
+          <h2 class="text-5xl font-black text-slate-900 mb-4">
+            Decimal to Binary
+          </h2>
+          <p class="text-xl text-slate-500 mb-12">
+            There are 2 main methods to perform this conversion.
+          </p>
+
+          <div
+            class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto text-left"
+          >
+            <div class="method-card border-indigo-100 bg-indigo-50/30">
+              <div
+                class="w-12 h-12 bg-indigo-600 text-white rounded-2xl flex items-center justify-center font-black text-xl mb-6"
+              >
+                1
+              </div>
+              <h3 class="text-2xl font-black text-indigo-900 mb-3">
+                Division Method
+              </h3>
+              <p class="text-indigo-700/70 text-sm leading-relaxed">
+                Repeatedly divide your number by 2 and track the remainders.
+                Perfect for large numbers where you don't know the bit values.
+              </p>
+            </div>
+
+            <div class="method-card border-blue-100 bg-blue-50/30">
+              <div
+                class="w-12 h-12 bg-blue-600 text-white rounded-2xl flex items-center justify-center font-black text-xl mb-6"
+              >
+                2
+              </div>
+              <h3 class="text-2xl font-black text-blue-900 mb-3">
+                Positional Method
+              </h3>
+              <p class="text-blue-700/70 text-sm leading-relaxed">
+                Compare your number against a table of power-of-2 values. Faster
+                for mental math and small numbers like 0-255.
               </p>
             </div>
           </div>
 
-          <div class="mt-16 text-center">
-            <button
-              onclick="goToStep(0)"
-              class="text-slate-500 hover:text-white transition-colors underline underline-offset-8"
+          <button
+            onclick="goToStep(3)"
+            class="mt-12 bg-slate-900 text-white px-16 py-5 rounded-full font-black text-lg shadow-xl hover:scale-105 transition-transform active:scale-95"
+          >
+            Start with Method 1 →
+          </button>
+        </div>
+      </section>
+
+      <!-- STEP 3: DIVISION LAB -->
+      <section id="step-3" class="lesson-step hidden space-y-8">
+        <div class="bg-white p-10 rounded-[2.5rem] border border-slate-200">
+          <div class="flex justify-between items-center mb-8">
+            <h2 class="text-3xl font-black">Phase 3: The Division Method</h2>
+            <span
+              class="bg-indigo-100 text-indigo-700 px-4 py-1 rounded-full text-xs font-bold uppercase"
+              >Method #1</span
             >
-              Restart Lesson
+          </div>
+
+          <div class="mb-10 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+            <div class="video-container shadow-xl border border-slate-200">
+              <iframe
+                src="https://www.youtube.com/embed/RKAQsyPRk_w"
+                frameborder="0"
+                allowfullscreen
+              ></iframe>
+            </div>
+            <div class="space-y-4">
+              <div class="instruction-step">
+                <div class="step-circle">1</div>
+                <div>
+                  <h4 class="font-black text-slate-900 text-sm">
+                    Divide & Track
+                  </h4>
+                  <p class="text-xs text-slate-600 mt-1">
+                    Divide your decimal number by 2. You will get a
+                    <b>Quotient</b> (the result) and a <b>Remainder</b> (which
+                    will always be either 0 or 1).
+                  </p>
+                </div>
+              </div>
+              <div class="instruction-step">
+                <div class="step-circle">2</div>
+                <div>
+                  <h4 class="font-black text-slate-900 text-sm">
+                    Repeat Until Zero
+                  </h4>
+                  <p class="text-xs text-slate-600 mt-1">
+                    Take the <b>Quotient</b> from the previous step and divide
+                    it by 2 again. Keep repeating this process until your
+                    Quotient reaches exactly <b>0</b>.
+                  </p>
+                </div>
+              </div>
+              <div class="instruction-step">
+                <div class="step-circle">3</div>
+                <div>
+                  <h4 class="font-black text-slate-900 text-sm">
+                    Reverse & Read
+                  </h4>
+                  <p class="text-xs text-slate-600 mt-1">
+                    Collect all the <b>Remainders</b> you found. Your binary
+                    number is the list of remainders read in
+                    <b>reverse order</b> (from the bottom up).
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="border-t pt-10">
+            <h3 class="text-xl font-bold mb-6">
+              Lab Task: Convert <span class="text-indigo-600">53</span>
+            </h3>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div
+                id="lab-rows"
+                class="space-y-3 bg-slate-900 p-6 rounded-[2rem]"
+              ></div>
+              <div
+                class="bg-slate-50 rounded-[2rem] p-10 border-2 border-dashed border-slate-200 flex flex-col items-center justify-center"
+              >
+                <div
+                  id="bit-stack"
+                  class="flex flex-col-reverse gap-2 mb-6 w-full max-w-[100px]"
+                ></div>
+                <div
+                  id="binary-final-text"
+                  class="text-4xl font-black mono text-slate-400"
+                >
+                  ????????
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <button
+            id="next-btn-3"
+            onclick="goToStep(4)"
+            class="btn-locked mt-10 mx-auto block bg-indigo-600 text-white px-12 py-4 rounded-full font-bold"
+            disabled
+          >
+            Try Method 2 →
+          </button>
+        </div>
+      </section>
+
+      <!-- STEP 4: POSITIONAL METHOD -->
+      <section id="step-4" class="lesson-step hidden space-y-8">
+        <div class="bg-white p-10 rounded-[3rem] border border-slate-200">
+          <div class="flex justify-between items-center mb-6">
+            <h2 class="text-3xl font-black">Phase 4: The Positional Method</h2>
+            <span
+              class="bg-blue-100 text-blue-700 px-4 py-1 rounded-full text-xs font-bold uppercase"
+              >Method #2</span
+            >
+          </div>
+          <div
+            class="flex flex-col md:flex-row justify-around items-center bg-slate-900 p-8 rounded-3xl text-white mb-10"
+          >
+            <div class="text-center">
+              <p class="text-xs text-indigo-400 uppercase font-black">
+                Number to Convert
+              </p>
+              <p class="text-5xl font-black">53</p>
+            </div>
+            <div class="text-center">
+              <p class="text-xs text-blue-400 uppercase font-black">
+                Remaining
+              </p>
+              <p id="decimal-display" class="text-5xl font-black">53</p>
+            </div>
+          </div>
+          <div
+            id="hw-bit-container"
+            class="flex flex-row-reverse justify-between gap-2 mb-10"
+          ></div>
+          <div
+            id="math-breakdown"
+            class="p-6 bg-slate-50 rounded-2xl text-center mono text-2xl"
+          >
+            0
+          </div>
+          <div
+            id="verification-status"
+            class="hidden mt-6 p-4 rounded-xl text-center font-bold"
+          ></div>
+          <button
+            id="next-btn-4"
+            onclick="goToStep(4.5)"
+            class="btn-locked mt-10 mx-auto block bg-indigo-600 text-white px-12 py-4 rounded-full font-bold shadow-xl transition-all"
+            disabled
+          >
+            Knowledge Check →
+          </button>
+        </div>
+      </section>
+
+      <!-- STEP 4.5: QUIZ -->
+      <section id="step-4.5" class="lesson-step hidden space-y-8">
+        <div
+          class="bg-white p-10 md:p-16 rounded-[3rem] border border-slate-200 relative overflow-hidden"
+        >
+          <div
+            class="absolute top-0 left-0 w-full flex"
+            id="quiz-progress-bar"
+          ></div>
+
+          <div
+            class="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-4"
+          >
+            <div>
+              <h2 class="text-3xl font-black text-slate-900">
+                Phase 4.5: Knowledge Check
+              </h2>
+              <p class="text-slate-500">
+                Solve 10 challenges. They get harder as you go!
+              </p>
+            </div>
+            <div
+              class="bg-indigo-900 text-white px-6 py-2 rounded-full font-black text-sm tracking-widest"
+            >
+              QUESTION <span id="quiz-current-num">1</span>/10
+            </div>
+          </div>
+
+          <div id="quiz-active-zone" class="max-w-2xl mx-auto">
+            <div
+              id="active-question-card"
+              class="quiz-card scale-100 transition-all duration-300"
+            ></div>
+          </div>
+
+          <div
+            id="quiz-completion-zone"
+            class="hidden text-center py-20 animate-in fade-in zoom-in-95 duration-500"
+          >
+            <div
+              class="w-24 h-24 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-8"
+            >
+              <svg
+                class="w-12 h-12"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="3"
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+            </div>
+            <h3 class="text-4xl font-black text-slate-900 mb-4">
+              Architect Certified!
+            </h3>
+            <p class="text-slate-500 mb-10 max-w-md mx-auto">
+              You've unlocked the <strong>Master Navigation Bar</strong>. You
+              can now jump to any part of the lesson using the menu at the top.
+            </p>
+            <button
+              id="next-btn-4-5"
+              onclick="goToStep(5)"
+              class="bg-indigo-600 text-white px-12 py-5 rounded-full font-black text-lg shadow-2xl hover:bg-indigo-700 hover:scale-105 transition-all"
+            >
+              Enter the Universal Sandbox →
             </button>
           </div>
         </div>
       </section>
+
+      <!-- STEP 5: SANDBOX -->
+      <section id="step-5" class="lesson-step hidden">
+        <div class="bg-slate-900 text-white p-12 rounded-[3rem] text-center">
+          <h2 class="text-4xl font-black mb-10">Universal Converter</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-2xl mx-auto">
+            <div>
+              <label
+                class="block text-xs mb-2 text-indigo-400 uppercase font-bold tracking-widest"
+                >Decimal</label
+              ><input
+                type="number"
+                id="sb-dec"
+                oninput="sbConvert('dec')"
+                class="w-full bg-slate-800 p-6 rounded-2xl text-3xl font-bold border-2 border-slate-700 focus:border-indigo-500 outline-none"
+              />
+            </div>
+            <div>
+              <label
+                class="block text-xs mb-2 text-blue-400 uppercase font-bold tracking-widest"
+                >Binary</label
+              ><input
+                type="text"
+                id="sb-bin"
+                oninput="sbConvert('bin')"
+                class="w-full bg-slate-800 p-6 rounded-2xl text-3xl mono border-2 border-slate-700 focus:border-blue-500 outline-none"
+              />
+            </div>
+          </div>
+          <button
+            onclick="goToStep(0)"
+            class="mt-12 text-slate-500 font-bold underline"
+          >
+            Start Over
+          </button>
+        </div>
+      </section>
     </main>
 
-    <!-- AI TOOLBOX OVERLAY -->
-    <div
-      id="ai-toolbox"
-      class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm"
-    >
-      <div
-        class="bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200"
-      >
-        <div
-          class="bg-indigo-600 p-6 text-white flex justify-between items-center"
-        >
-          <div>
-            <h3 class="font-bold text-xl">Architect Assistant</h3>
-            <p class="text-xs opacity-80">Powered by Gemini AI</p>
-          </div>
-          <button
-            onclick="toggleAIToolbox()"
-            class="p-2 hover:bg-white/10 rounded-full"
-          >
-            <svg
-              class="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
-        </div>
-
-        <div class="p-8 space-y-6">
-          <div
-            id="ai-response"
-            class="min-h-[100px] text-slate-600 text-sm leading-relaxed bg-slate-50 p-4 rounded-2xl border border-slate-100"
-          >
-            Ask me to explain a concept or generate a challenge!
-          </div>
-
-          <div class="grid grid-cols-2 gap-3">
-            <button
-              onclick="askAI('explain')"
-              class="py-3 px-4 bg-white border border-slate-200 rounded-xl text-xs font-bold hover:bg-slate-50 transition-colors"
-            >
-              ✨ Explain Rollover
-            </button>
-            <button
-              onclick="askAI('challenge')"
-              class="py-3 px-4 bg-white border border-slate-200 rounded-xl text-xs font-bold hover:bg-slate-50 transition-colors"
-            >
-              ✨ New Challenge
-            </button>
-          </div>
-          <button
-            onclick="askAI('story')"
-            class="w-full py-3 bg-indigo-50 text-indigo-700 border border-indigo-100 rounded-xl text-xs font-bold flex items-center justify-center gap-2"
-          >
-            ✨ Binary Storyteller
-          </button>
-          <button
-            id="tts-btn"
-            onclick="askAI('tts')"
-            class="w-full py-3 bg-slate-900 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2"
-          >
-            🔊 Listen to Voice Guidance
-          </button>
-        </div>
-      </div>
-    </div>
-
     <script>
-      const apiKey = "";
       let currentStep = 0;
+      const bitValues = [1, 2, 4, 8, 16, 32, 64, 128];
+      const stepOrder = [0, 0.1, 0.5, 1, 2, 2.5, 3, 4, 4.5, 5];
+      let hasCompletedEverything = false;
 
-      // --- Sound Engine ---
-      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      let p2Bits = Array(8).fill(0);
+      let hwBits = Array(8).fill(0);
 
-      const sounds = {
-        click: () => playTone(300, 0.05, "triangle", 0.2),
-        thump: () => playTone(80, 0.1, "sine", 0.5),
-        success: () => {
-          playTone(440, 0.1, "sine", 0.2);
-          setTimeout(() => playTone(880, 0.2, "sine", 0.2), 100);
+      const quizQuestions = [
+        {
+          type: "b2d",
+          q: "1010",
+          a: "10",
+          hint: "Identify '1' positions: 8 + 2. Add them up!",
         },
-        error: () => {
-          playTone(150, 0.1, "sawtooth", 0.2);
-          setTimeout(() => playTone(120, 0.2, "sawtooth", 0.2), 50);
+        {
+          type: "d2b",
+          q: "7",
+          a: "111",
+          hint: "Think positional: 4 + 2 + 1 = 7. All three rightmost switches ON.",
         },
-        pop: () => playTone(600, 0.05, "sine", 0.1),
-        swoosh: () => {
-          const osc = audioCtx.createOscillator();
-          const gain = audioCtx.createGain();
-          osc.frequency.exponentialRampToValueAtTime(
-            10,
-            audioCtx.currentTime + 0.3,
-          );
-          gain.gain.exponentialRampToValueAtTime(
-            0.01,
-            audioCtx.currentTime + 0.3,
-          );
-          osc.connect(gain);
-          gain.connect(audioCtx.destination);
-          osc.start();
-          osc.stop(audioCtx.currentTime + 0.3);
+        {
+          type: "b2d",
+          q: "1111",
+          a: "15",
+          hint: "A sequence of four '1's at the end is 8 + 4 + 2 + 1.",
         },
-      };
+        {
+          type: "d2b",
+          q: "19",
+          a: "10011",
+          hint: "Subtraction: 19 - 16 = 3. Now convert 3.",
+        },
+        {
+          type: "b2d",
+          q: "00101010",
+          a: "42",
+          hint: "Check positions: 32 + 8 + 2.",
+        },
+        {
+          type: "d2b",
+          q: "63",
+          a: "111111",
+          hint: "Hint: 63 is one less than 64. This means all bits smaller than 64 are ON.",
+        },
+        {
+          type: "b2d",
+          q: "10000001",
+          a: "129",
+          hint: "Just add the two ends: 128 + 1.",
+        },
+        {
+          type: "d2b",
+          q: "85",
+          a: "1010101",
+          hint: "Alternating bits! Try 64 + 16 + 4 + 1.",
+        },
+        {
+          type: "d2b",
+          q: "127",
+          a: "1111111",
+          hint: "This is one less than 128. Turn everything smaller than 128 to '1'.",
+        },
+        {
+          type: "d2b",
+          q: "255",
+          a: "11111111",
+          hint: "The max value! Every bit in the 8-bit system must be ON.",
+        },
+      ];
 
-      function playTone(freq, duration, type, vol) {
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = type;
-        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-        gain.gain.setValueAtTime(vol, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(
-          0.01,
-          audioCtx.currentTime + duration,
-        );
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start();
-        osc.stop(audioCtx.currentTime + duration);
-      }
+      let currentQuizIndex = 0;
 
-      // --- Navigation ---
       function goToStep(num) {
-        sounds.pop();
         currentStep = num;
         document
-          .querySelectorAll("section")
+          .querySelectorAll(".lesson-step")
           .forEach((s) => s.classList.add("hidden"));
         document.getElementById(`step-${num}`).classList.remove("hidden");
-
         const header = document.getElementById("main-header");
-        if (num > 0) header.classList.remove("hidden");
-        else header.classList.add("hidden");
 
-        document.getElementById("current-step-num").innerText = num;
+        if (num > 0) {
+          header.classList.remove("hidden");
+          document.getElementById("current-step-num").innerText = num;
+          const dots = [0.1, 0.5, 1, 2, 2.5, 3, 4, 4.5, 5];
+          dots.forEach((d) => {
+            const elId = `dot-${d.toString().replace(".", "-")}`;
+            const el = document.getElementById(elId);
+            if (el) el.style.backgroundColor = d <= num ? "#4f46e5" : "#e2e8f0";
+          });
+        } else header.classList.add("hidden");
 
-        if (num === 4) initAlgorithm();
-        if (num === 6) initBitFlipper();
+        if (hasCompletedEverything) {
+          document.getElementById("master-nav").classList.remove("hidden");
+          document.getElementById("status-badge").classList.remove("hidden");
+          document.getElementById("status-badge").classList.add("flex");
+        }
+
         window.scrollTo(0, 0);
+        if (num === 1) resetPhase1();
+        if (num === 2) renderP2();
+        if (num === 3) initLab();
+        if (num === 4) renderHw();
+        if (num === 4.5) initSequentialQuiz();
       }
 
       function goBack() {
-        if (currentStep > 0) goToStep(currentStep - 1);
+        const idx = stepOrder.indexOf(currentStep);
+        if (idx > 0) goToStep(stepOrder[idx - 1]);
       }
 
-      // --- Counters ---
-      let decVal = 0,
-        binVal = 0,
-        interacted = { dec: false, bin: false };
-      function incrementCounter(type) {
-        sounds.click();
-        if (type === "dec") {
-          decVal++;
-          interacted.dec = true;
-          updateCounterUI("dec", 10);
-        } else {
-          binVal++;
-          interacted.bin = true;
-          updateCounterUI("bin", 2);
+      function unlockButton(id) {
+        const bId = `next-btn-${id.toString().replace(".", "-")}`;
+        const b = document.getElementById(bId);
+        if (b) {
+          b.disabled = false;
+          b.classList.remove("btn-locked");
+          b.classList.add("next-btn-anim");
         }
-        checkStep2Completion();
       }
 
-      function updateCounterUI(type, base) {
-        const val = type === "dec" ? decVal : binVal;
-        const prefix = type === "dec" ? "d" : "b";
-        const count = type === "dec" ? 2 : 4;
-        let digits = val.toString(base).split("").map(Number);
-        while (digits.length < count) digits.unshift(0);
-        digits = digits.slice(-count);
+      let dc = 0;
+      function resetPhase1() {
+        dc = 0;
+        document.getElementById("dec-display").innerText = "0";
+        document.getElementById("bin-display").innerText = "0000";
+      }
 
-        digits.forEach((digit, i) => {
-          const pos = count - 1 - i;
-          const el = document.getElementById(`${prefix}-pos-${pos}`);
-          const prevVal = parseInt(el.innerText);
-          if (prevVal !== digit) {
-            el.innerText = digit;
-            if (digit === 0 && prevVal === base - 1) {
-              sounds.thump();
-              el.classList.add("rollover-flash");
-              setTimeout(() => el.classList.remove("rollover-flash"), 400);
-            }
-          }
+      function countDecimal() {
+        dc++;
+        const currentVal = dc % 10;
+        document.getElementById("dec-display").innerText = currentVal;
+        document.getElementById("bin-display").innerText = currentVal
+          .toString(2)
+          .padStart(4, "0");
+        if (dc >= 10) unlockButton(1);
+      }
+
+      function renderP2() {
+        const c = document.getElementById("p2-bit-container");
+        c.innerHTML = "";
+        bitValues.forEach((v, i) => {
+          const wrapper = document.createElement("div");
+          wrapper.className = "flex flex-col items-center flex-1 gap-3";
+          const btn = document.createElement("button");
+          btn.className = `w-full h-20 rounded-xl font-black text-xl transition-all ${p2Bits[i] ? "bit-on" : "bit-off"}`;
+          btn.innerText = p2Bits[i];
+          btn.onclick = () => {
+            p2Bits[i] = 1 - p2Bits[i];
+            renderP2();
+          };
+          const label = document.createElement("span");
+          label.className = "text-[10px] font-black text-slate-400 mono";
+          label.innerText = v;
+          wrapper.appendChild(btn);
+          wrapper.appendChild(label);
+          c.appendChild(wrapper);
         });
+        const sum = p2Bits.reduce((acc, b, i) => acc + b * bitValues[i], 0);
+        document.getElementById("phase2-sum").innerText = sum;
+        if (sum === 23) unlockButton(2);
       }
 
-      function checkStep2Completion() {
-        if (interacted.dec && interacted.bin) {
-          const btn = document.getElementById("next-btn-2");
-          if (btn.disabled) sounds.success();
-          btn.classList.remove("btn-locked", "bg-slate-200", "text-slate-400");
-          btn.classList.add("bg-indigo-600", "text-white", "next-btn-anim");
-          btn.disabled = false;
-        }
-      }
-
-      // --- Algorithm ---
-      const ALGO_STEPS = [
+      const LAB = [
+        { v: 53, q: 26, r: 1 },
+        { v: 26, q: 13, r: 0 },
         { v: 13, q: 6, r: 1 },
         { v: 6, q: 3, r: 0 },
         { v: 3, q: 1, r: 1 },
         { v: 1, q: 0, r: 1 },
       ];
-      let completedAlgorithm = [false, false, false, false];
-
-      function initAlgorithm() {
-        const container = document.getElementById("rows-container");
-        if (container.children.length > 0) return;
-        container.innerHTML = "";
-        ALGO_STEPS.forEach((step, i) => {
+      function initLab() {
+        const c = document.getElementById("lab-rows");
+        c.innerHTML = "";
+        LAB.forEach((t, i) => {
           const row = document.createElement("div");
-          row.id = `algo-row-${i}`;
-          row.className = `grid grid-cols-4 gap-2 items-center p-3 rounded-xl border transition-all ${i === 0 ? "bg-white shadow-sm border-slate-200" : "opacity-20 pointer-events-none"}`;
+          row.className = `grid grid-cols-4 gap-2 items-center p-2 rounded-xl transition-all ${i === 0 ? "row-active" : "opacity-20"}`;
+          row.id = `lab-row-${i}`;
           row.innerHTML = `
-                <div class="font-bold text-slate-800">${step.v}</div>
-                <div class="text-slate-400">÷ 2</div>
-                <input type="number" id="q-${i}" class="bg-slate-100 p-2 rounded-lg w-full outline-none focus:ring-2 ring-indigo-500" placeholder="?">
-                <input type="number" id="r-${i}" class="bg-slate-100 p-2 rounded-lg w-full outline-none focus:ring-2 ring-indigo-500" placeholder="?">
-            `;
-          container.appendChild(row);
-          const pill = document.createElement("div");
-          pill.id = `pill-${i}`;
-          pill.className =
-            "remainder-pill bg-indigo-600 text-white text-center py-2 rounded-lg font-bold shadow-md";
-          pill.innerText = step.r;
-          document.getElementById("stack-container").appendChild(pill);
-          [row.querySelector(`#q-${i}`), row.querySelector(`#r-${i}`)].forEach(
-            (inp) => {
-              inp.addEventListener("input", () => validateStep(i));
-            },
-          );
+                    <div class="text-white text-center font-bold">${i === 0 ? 53 : "?"}</div>
+                    <input type="number" id="lab-q-${i}" placeholder="Q" class="bg-slate-700 text-white p-2 rounded text-center">
+                    <input type="number" id="lab-r-${i}" placeholder="R" class="bg-slate-700 text-white p-2 rounded text-center">
+                    <button onclick="checkLab(${i})" class="bg-indigo-600 text-white rounded p-2 text-xs font-bold">Check</button>
+                `;
+          c.appendChild(row);
         });
       }
-
-      function validateStep(idx) {
-        const qVal = document.getElementById(`q-${idx}`).value;
-        const rVal = document.getElementById(`r-${idx}`).value;
-        if (qVal === "" || rVal === "") return;
-        const q = parseInt(qVal),
-          r = parseInt(rVal),
-          target = ALGO_STEPS[idx];
-        const row = document.getElementById(`algo-row-${idx}`);
-
-        if (q === target.q && r === target.r) {
-          if (!completedAlgorithm[idx]) sounds.success();
-          row.classList.add("input-success");
-          row.classList.remove("input-error", "bg-white");
-          document.getElementById(`pill-${idx}`).classList.add("visible");
-          completedAlgorithm[idx] = true;
-          if (idx < 3) {
-            const next = document.getElementById(`algo-row-${idx + 1}`);
-            next.classList.remove("opacity-20", "pointer-events-none");
-            next.classList.add("bg-white", "shadow-sm", "border-slate-200");
+      function checkLab(i) {
+        const q = parseInt(document.getElementById(`lab-q-${i}`).value);
+        const r = parseInt(document.getElementById(`lab-r-${i}`).value);
+        if (q === LAB[i].q && r === LAB[i].r) {
+          const pill = document.createElement("div");
+          pill.className =
+            "remainder-pill visible bg-indigo-600 text-white text-center py-2 rounded font-bold";
+          pill.innerText = r;
+          document.getElementById("bit-stack").appendChild(pill);
+          if (i < LAB.length - 1) {
+            const next = document.getElementById(`lab-row-${i + 1}`);
+            next.classList.remove("opacity-20");
+            next.classList.add("row-active");
+            next.children[0].innerText = LAB[i].q;
+          } else {
+            document.getElementById("binary-final-text").innerText = "00110101";
+            unlockButton(3);
           }
-          updateAlgoStatus();
-        } else if (qVal.length >= 1 && rVal.length >= 1) {
-          sounds.error();
-          row.classList.add("input-error");
         }
       }
 
-      function updateAlgoStatus() {
-        let res = "";
-        for (let i = 3; i >= 0; i--)
-          res += completedAlgorithm[i] ? ALGO_STEPS[i].r : "?";
-        document.getElementById("binary-final-text").innerText = res;
-        if (completedAlgorithm.every((s) => s)) {
-          const btn = document.getElementById("next-btn-4");
-          btn.classList.remove("btn-locked", "bg-slate-200", "text-slate-400");
-          btn.classList.add("bg-indigo-600", "text-white", "next-btn-anim");
-          btn.disabled = false;
-        }
+      function renderHw() {
+        const c = document.getElementById("hw-bit-container");
+        c.innerHTML = "";
+        bitValues.forEach((v, i) => {
+          const btn = document.createElement("button");
+          btn.className = `flex-1 h-16 rounded-xl font-black transition-all ${hwBits[i] ? "bit-on" : "bit-off"}`;
+          btn.innerText = hwBits[i];
+          btn.onclick = () => {
+            hwBits[i] = 1 - hwBits[i];
+            renderHw();
+          };
+          c.appendChild(btn);
+        });
+        const total = hwBits.reduce((acc, b, i) => acc + b * bitValues[i], 0);
+        document.getElementById("decimal-display").innerText = 53 - total;
+        const parts = hwBits
+          .map((b, i) => (b ? bitValues[i] : null))
+          .filter((n) => n)
+          .reverse();
+        document.getElementById("math-breakdown").innerText = parts.length
+          ? parts.join(" + ") + " = " + total
+          : "0";
+        const status = document.getElementById("verification-status");
+        if (total === 53) {
+          status.innerText = "MATCH! 53 is now 110101.";
+          status.className = "block bg-emerald-500 text-white p-4 rounded-xl";
+          unlockButton(4);
+        } else status.className = "hidden";
       }
 
-      // --- Bit Flipper ---
-      let bits = Array(8).fill(0);
-      const bitValues = [1, 2, 4, 8, 16, 32, 64, 128];
-      function initBitFlipper() {
-        const container = document.getElementById("bit-container");
-        if (container.children.length > 0) return;
-        container.innerHTML = "";
-        bitValues
-          .slice()
-          .reverse()
-          .forEach((val, i) => {
-            const realIdx = 7 - i;
-            const card = document.createElement("div");
-            card.innerHTML = `<span class="text-[10px] font-bold text-slate-400">${val}</span><button onclick="toggleBit(${realIdx})" id="bit-${realIdx}" class="bit-card bit-off w-12 h-16 sm:w-16 sm:h-24 rounded-xl text-2xl font-black border-2">0</button>`;
-            container.appendChild(card);
-          });
+      function initSequentialQuiz() {
+        currentQuizIndex = 0;
+        const bar = document.getElementById("quiz-progress-bar");
+        bar.innerHTML = quizQuestions
+          .map(
+            (_, i) =>
+              `<div id="progress-seg-${i}" class="progress-segment"></div>`,
+          )
+          .join("");
+        renderActiveQuestion();
       }
 
-      function toggleBit(idx) {
-        sounds.click();
-        bits[idx] = bits[idx] === 0 ? 1 : 0;
-        const btn = document.getElementById(`bit-${idx}`);
-        btn.innerText = bits[idx];
-        btn.classList.toggle("bit-on");
-        btn.classList.toggle("bit-off");
-        updateTotal();
+      function renderActiveQuestion() {
+        const q = quizQuestions[currentQuizIndex];
+        const container = document.getElementById("active-question-card");
+        const numDisplay = document.getElementById("quiz-current-num");
+        numDisplay.innerText = currentQuizIndex + 1;
+
+        quizQuestions.forEach((_, i) => {
+          const seg = document.getElementById(`progress-seg-${i}`);
+          seg.className =
+            "progress-segment " +
+            (i < currentQuizIndex
+              ? "completed"
+              : i === currentQuizIndex
+                ? "active"
+                : "");
+        });
+
+        const label =
+          q.type === "d2b"
+            ? `Convert <span class="text-indigo-600 font-black">${q.q}</span> to binary`
+            : `Convert binary <span class="text-blue-600 mono font-bold tracking-widest">${q.q}</span> to decimal`;
+
+        container.innerHTML = `
+                <div class="flex justify-between items-center mb-8">
+                    <div class="text-xs font-black text-slate-400 uppercase tracking-widest">Question ${currentQuizIndex + 1}</div>
+                    <button onclick="toggleQuizHint()" class="flex items-center gap-2 bg-indigo-50 text-indigo-600 px-4 py-2 rounded-xl text-xs font-bold border border-indigo-100 hover:bg-indigo-100 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                        Need a Hint?
+                    </button>
+                </div>
+                <h3 class="text-3xl font-black text-slate-900 mb-10 text-center leading-tight">${label}</h3>
+                <div class="flex flex-col gap-4">
+                    <input type="text" id="quiz-active-input" 
+                        class="w-full bg-slate-50 border-2 border-slate-200 rounded-3xl p-6 text-2xl font-black text-center mono focus:outline-none focus:border-indigo-500 transition-colors" 
+                        placeholder="Enter Result..."
+                        onkeydown="if(event.key==='Enter') checkSequentialQuiz()">
+                    <button onclick="checkSequentialQuiz()" class="w-full bg-slate-900 text-white py-6 rounded-3xl text-xl font-bold hover:bg-slate-800 shadow-xl transition-all">Submit Answer</button>
+                </div>
+                <div id="quiz-hint-area" class="hint-box"><strong>HINT:</strong> ${q.hint}</div>
+            `;
+        document.getElementById("quiz-active-input").focus();
       }
 
-      function updateTotal() {
-        let total = 0;
-        bits.forEach((b, i) => (total += b * bitValues[i]));
-        document.getElementById("total-display").innerText = total;
-        const btn = document.getElementById("next-btn-6");
-        if (total === 13) {
-          if (btn.disabled) sounds.success();
-          btn.classList.remove("btn-locked", "bg-slate-200", "text-slate-400");
-          btn.classList.add("bg-green-600", "text-white", "next-btn-anim");
-          btn.disabled = false;
+      function toggleQuizHint() {
+        const el = document.getElementById("quiz-hint-area");
+        el.style.display = el.style.display === "block" ? "none" : "block";
+      }
+
+      function checkSequentialQuiz() {
+        const input = document.getElementById("quiz-active-input");
+        const card = document.getElementById("active-question-card");
+        const val = input.value.trim();
+        const correct =
+          val.replace(/^0+/, "") ===
+            quizQuestions[currentQuizIndex].a.replace(/^0+/, "") ||
+          (val === "0" && quizQuestions[currentQuizIndex].a === "0");
+
+        if (correct) {
+          card.classList.add("correct-feedback");
+          setTimeout(() => {
+            card.classList.remove("correct-feedback");
+            if (currentQuizIndex < quizQuestions.length - 1) {
+              currentQuizIndex++;
+              renderActiveQuestion();
+            } else {
+              hasCompletedEverything = true;
+              document
+                .getElementById("quiz-active-zone")
+                .classList.add("hidden");
+              document
+                .getElementById("quiz-completion-zone")
+                .classList.remove("hidden");
+              document
+                .getElementById("quiz-current-num")
+                .parentElement.classList.add("hidden");
+              document.getElementById("master-nav").classList.remove("hidden");
+              document
+                .getElementById("status-badge")
+                .classList.remove("hidden");
+              document.getElementById("status-badge").classList.add("flex");
+            }
+          }, 600);
         } else {
-          btn.classList.add("btn-locked", "bg-slate-200", "text-slate-400");
-          btn.classList.remove("bg-green-600", "text-white", "next-btn-anim");
-          btn.disabled = true;
+          card.classList.add("incorrect-feedback");
+          document.getElementById("quiz-hint-area").style.display = "block";
+          setTimeout(() => card.classList.remove("incorrect-feedback"), 500);
         }
       }
 
-      // --- Sandbox ---
       function sbConvert(src) {
-        sounds.pop();
-        const dec = document.getElementById("sb-dec"),
-          bin = document.getElementById("sb-bin");
+        const d = document.getElementById("sb-dec"),
+          b = document.getElementById("sb-bin");
         if (src === "dec") {
-          const val = parseInt(dec.value);
-          if (!isNaN(val) && val >= 0 && val <= 255)
-            bin.value = val.toString(2).padStart(8, "0");
+          let v = Math.min(255, parseInt(d.value || 0));
+          b.value = v.toString(2).padStart(8, "0");
         } else {
-          if (/^[01]*$/.test(bin.value))
-            dec.value = parseInt(bin.value || "0", 2);
+          let v = b.value.replace(/[^01]/g, "").substring(0, 8);
+          b.value = v;
+          d.value = v ? parseInt(v, 2) : 0;
         }
-      }
-
-      // --- AI Logic ---
-      function toggleAIToolbox() {
-        sounds.swoosh();
-        document.getElementById("ai-toolbox").classList.toggle("hidden");
-      }
-
-      async function callGemini(
-        prompt,
-        systemPrompt = "You are a helpful educational assistant for a binary number learning app.",
-      ) {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-        const payload = {
-          contents: [{ parts: [{ text: prompt }] }],
-          systemInstruction: { parts: [{ text: systemPrompt }] },
-        };
-        const maxRetries = 5;
-        for (let i = 0; i < maxRetries; i++) {
-          try {
-            const response = await fetch(url, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(payload),
-            });
-            if (!response.ok)
-              throw new Error(`HTTP error! status: ${response.status}`);
-            const result = await response.json();
-            const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
-            if (text) return text;
-          } catch (error) {
-            if (i === maxRetries - 1) throw error;
-            await new Promise((resolve) =>
-              setTimeout(resolve, Math.pow(2, i) * 1000),
-            );
-          }
-        }
-      }
-
-      async function askAI(type) {
-        sounds.pop();
-        const display = document.getElementById("ai-response"),
-          realityDisplay = document.getElementById("reality-text");
-        if (type === "reality-check") {
-          realityDisplay.innerText = "Consulting the architect databases...";
-          realityDisplay.classList.add("ai-loading-shimmer");
-          try {
-            realityDisplay.innerText = await callGemini(
-              `Fascinating real-world fact about decimal ${document.getElementById("sb-dec").value || "0"}. 2 sentences max.`,
-            );
-            sounds.success();
-          } catch (e) {
-            realityDisplay.innerText = "Connection failed.";
-            sounds.error();
-          }
-          realityDisplay.classList.remove("ai-loading-shimmer");
-          return;
-        }
-        display.innerHTML =
-          '<div class="h-4 w-full ai-loading-shimmer rounded mb-2"></div><div class="h-4 w-2/3 ai-loading-shimmer rounded"></div>';
-        try {
-          let prompt = "";
-          if (type === "explain")
-            prompt = "Explain binary 'rollover' odometer analogy. Friendly.";
-          if (type === "challenge")
-            prompt =
-              "Give a number 20-100 to convert to binary. Include a power of 2 hint.";
-          if (type === "story")
-            prompt =
-              "Robot named 'Bit' carries decimal 13 across a bridge with binary switches. 3 sentences.";
-          if (type === "guide-division")
-            return speakLogic(
-              "Tutoring mode: Explain the division steps for number 13 clearly.",
-            );
-          if (type === "tts")
-            return speakLogic("Welcome to the Number Architect.");
-          display.innerText = await callGemini(prompt);
-          sounds.success();
-        } catch (e) {
-          display.innerText = "Unable to reach the Architect AI.";
-          sounds.error();
-        }
-      }
-
-      async function speakLogic(customText) {
-        const prompt =
-          customText || "Explain the concept of binary systems simply.";
-        try {
-          const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`,
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                contents: [{ parts: [{ text: prompt }] }],
-                generationConfig: {
-                  responseModalities: ["AUDIO"],
-                  speechConfig: {
-                    voiceConfig: { prebuiltVoiceConfig: { voiceName: "Puck" } },
-                  },
-                },
-                model: "gemini-2.5-flash-preview-tts",
-              }),
-            },
-          );
-          const data = await response.json();
-          const pcmData =
-            data.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
-          if (pcmData) playAudio(pcmData);
-        } catch (e) {
-          console.error(e);
-        }
-      }
-
-      function playAudio(base64) {
-        const binaryString = atob(base64);
-        const bytes = new Uint8Array(binaryString.length);
-        for (let i = 0; i < binaryString.length; i++)
-          bytes[i] = binaryString.charCodeAt(i);
-        const wavHeader = createWavHeader(bytes.length, 24000);
-        const blob = new Blob([wavHeader, bytes], { type: "audio/wav" });
-        const audio = new Audio(URL.createObjectURL(blob));
-        audio.play();
-      }
-
-      function createWavHeader(dataLength, sampleRate) {
-        const header = new ArrayBuffer(44);
-        const view = new DataView(header);
-        const writeString = (offset, str) => {
-          for (let i = 0; i < str.length; i++)
-            view.setUint8(offset + i, str.charCodeAt(i));
-        };
-        writeString(0, "RIFF");
-        view.setUint32(4, 36 + dataLength, true);
-        writeString(8, "WAVE");
-        writeString(12, "fmt ");
-        view.setUint32(16, 16, true);
-        view.setUint16(20, 1, true);
-        view.setUint16(22, 1, true);
-        view.setUint32(24, sampleRate, true);
-        view.setUint32(28, sampleRate * 2, true);
-        view.setUint16(32, 2, true);
-        view.setUint16(34, 16, true);
-        writeString(36, "data");
-        view.setUint32(40, dataLength, true);
-        return header;
       }
     </script>
   </body>
