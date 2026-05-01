@@ -1,16 +1,22 @@
 <!doctype html>
+
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <title>Number System Architect: Interactive Lesson</title>
+
     <script src="https://cdn.tailwindcss.com"></script>
+
     <style>
       @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&family=Fira+Code:wght@400;700&display=swap");
 
       body {
         font-family: "Inter", sans-serif;
       }
+
       .mono {
         font-family: "Fira Code", monospace;
       }
@@ -18,16 +24,24 @@
       .bit-card {
         transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       }
+
       .bit-on {
         background-color: #3b82f6;
+
         color: white;
+
         transform: translateY(-4px);
+
         box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.4);
+
         border-color: #60a5fa;
       }
+
       .bit-off {
         background-color: #f8fafc;
+
         color: #94a3b8;
+
         border-color: #e2e8f0;
       }
 
@@ -36,77 +50,526 @@
         100% {
           transform: scale(1);
         }
+
         50% {
           transform: scale(1.02);
         }
       }
+
       .next-btn-anim {
         animation: pulse-soft 2s infinite;
       }
 
       .binary-bg {
         font-family: "Fira Code", monospace;
+
         mask-image: linear-gradient(to bottom, black, transparent);
+
         user-select: none;
+
+        position: relative;
+
+        overflow: hidden;
       }
+
+      .binary-bg::before {
+        content: "";
+
+        position: absolute;
+
+        top: 0;
+
+        left: 0;
+
+        right: 0;
+
+        bottom: 0;
+
+        background: linear-gradient(
+          45deg,
+          transparent 30%,
+
+          rgba(99, 102, 241, 0.1) 50%,
+
+          transparent 70%
+        );
+
+        animation: binary-shimmer 8s ease-in-out infinite;
+      }
+
+      @keyframes binary-shimmer {
+        0%,
+        100% {
+          transform: translateX(-100%) translateY(-100%);
+        }
+
+        50% {
+          transform: translateX(100%) translateY(100%);
+        }
+      }
+
+      .binary-digit {
+        display: inline-block;
+
+        transition: all 0.3s ease;
+
+        animation: binary-pulse 4s ease-in-out infinite;
+      }
+
+      .binary-digit:nth-child(odd) {
+        animation-delay: 0.5s;
+      }
+
+      .binary-digit:nth-child(even) {
+        animation-delay: 1s;
+      }
+
+      @keyframes binary-pulse {
+        0%,
+        100% {
+          opacity: 0.3;
+
+          transform: scale(1);
+        }
+
+        50% {
+          opacity: 0.8;
+
+          transform: scale(1.05);
+        }
+      }
+
+      /* Dark mode binary styling */
+
+      .dark .binary-bg {
+        color: #6366f1;
+
+        text-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+      }
+
+      .dark .binary-bg::before {
+        background: linear-gradient(
+          45deg,
+          transparent 30%,
+
+          rgba(99, 102, 241, 0.2) 50%,
+
+          transparent 70%
+        );
+      }
+
       .btn-locked {
         opacity: 0.5;
+
         cursor: not-allowed;
+
         filter: grayscale(1);
       }
 
       .remainder-pill {
         transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
         transform: scale(0);
+
         opacity: 0;
       }
+
       .remainder-pill.visible {
         transform: scale(1);
+
         opacity: 1;
       }
 
       .row-active {
         border-left: 4px solid #6366f1;
+
         padding-left: 12px;
+
         background: rgba(99, 102, 241, 0.05);
       }
 
+      /* Enhanced definition cards */
+
       .definition-card {
+        position: relative;
+
+        overflow: hidden;
+
         border-left: 4px solid #6366f1;
+
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+        transform: translateX(0);
+      }
+
+      .definition-card::before {
+        content: "";
+
+        position: absolute;
+
+        top: 0;
+
+        left: 0;
+
+        width: 100%;
+
+        height: 100%;
+
+        background: linear-gradient(
+          135deg,
+          transparent 0%,
+
+          rgba(99, 102, 241, 0.05) 100%
+        );
+
+        opacity: 0;
+
+        transition: opacity 0.3s ease;
+      }
+
+      .definition-card:hover {
+        transform: translateX(4px);
+
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+      }
+
+      .definition-card:hover::before {
+        opacity: 1;
+      }
+
+      .definition-card.border-blue-500 {
+        border-left-color: #3b82f6;
+      }
+
+      .definition-card.border-blue-500::before {
+        background: linear-gradient(
+          135deg,
+          transparent 0%,
+
+          rgba(59, 130, 246, 0.05) 100%
+        );
+      }
+
+      .definition-card.border-amber-500 {
+        border-left-color: #f59e0b;
+      }
+
+      .definition-card.border-amber-500::before {
+        background: linear-gradient(
+          135deg,
+          transparent 0%,
+
+          rgba(245, 158, 11, 0.05) 100%
+        );
+      }
+
+      /* Dark mode definition cards */
+
+      .dark .definition-card {
+        background-color: #1e293b !important;
+
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      }
+
+      .dark .definition-card:hover {
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+      }
+
+      .dark .definition-card::before {
+        background: linear-gradient(
+          135deg,
+          transparent 0%,
+
+          rgba(99, 102, 241, 0.1) 100%
+        );
+      }
+
+      .dark .definition-card.border-blue-500::before {
+        background: linear-gradient(
+          135deg,
+          transparent 0%,
+
+          rgba(59, 130, 246, 0.1) 100%
+        );
+      }
+
+      .dark .definition-card.border-amber-500::before {
+        background: linear-gradient(
+          135deg,
+          transparent 0%,
+
+          rgba(245, 158, 11, 0.1) 100%
+        );
       }
 
       .video-container {
         position: relative;
+
         padding-bottom: 56.25%;
+
         height: 0;
+
         overflow: hidden;
+
         border-radius: 1.5rem;
       }
+
       .video-container iframe {
         position: absolute;
+
         top: 0;
+
         left: 0;
+
         width: 100%;
+
         height: 100%;
       }
 
       .instruction-step {
         @apply flex items-center gap-4 p-4 bg-slate-50 rounded-xl border border-slate-200 mb-4;
       }
+
       .step-circle {
         @apply w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold flex-shrink-0;
       }
 
       .method-card {
-        @apply p-8 rounded-[2rem] border-2 transition-all cursor-pointer hover:shadow-xl;
+        position: relative;
+
+        overflow: hidden;
+
+        padding: 2rem;
+
+        border-radius: 2rem;
+
+        border: 2px solid;
+
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+        cursor: pointer;
+
+        transform: translateY(0);
+      }
+
+      .method-card::before {
+        content: "";
+
+        position: absolute;
+
+        top: 0;
+
+        left: 0;
+
+        width: 100%;
+
+        height: 100%;
+
+        background: linear-gradient(
+          135deg,
+          transparent 0%,
+
+          rgba(255, 255, 255, 0.1) 100%
+        );
+
+        opacity: 0;
+
+        transition: opacity 0.3s ease;
+      }
+
+      .method-card::after {
+        content: "";
+
+        position: absolute;
+
+        top: -50%;
+
+        left: -50%;
+
+        width: 200%;
+
+        height: 200%;
+
+        background: linear-gradient(
+          45deg,
+          transparent 30%,
+
+          rgba(255, 255, 255, 0.1) 50%,
+
+          transparent 70%
+        );
+
+        opacity: 0;
+
+        transition: all 0.6s ease;
+
+        transform: rotate(45deg);
+      }
+
+      .method-card:hover {
+        transform: translateY(-8px) scale(1.02);
+
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+      }
+
+      .method-card:hover::before {
+        opacity: 1;
+      }
+
+      .method-card:hover::after {
+        opacity: 1;
+
+        transform: rotate(45deg) translate(50%, 50%);
+      }
+
+      .method-card:active {
+        transform: translateY(-4px) scale(1.01);
+
+        transition: all 0.1s ease;
+      }
+
+      .method-card .number-badge {
+        transition: all 0.3s ease;
+      }
+
+      .method-card:hover .number-badge {
+        transform: scale(1.1) rotate(5deg);
+
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      }
+
+      /* Division Method card specific */
+
+      .method-card.border-indigo-100 {
+        background: linear-gradient(
+          135deg,
+          rgba(99, 102, 241, 0.05) 0%,
+
+          rgba(99, 102, 241, 0.1) 100%
+        );
+
+        border-color: #6366f1;
+      }
+
+      .method-card.border-indigo-100:hover {
+        background: linear-gradient(
+          135deg,
+          rgba(99, 102, 241, 0.1) 0%,
+
+          rgba(99, 102, 241, 0.15) 100%
+        );
+
+        border-color: #4f46e5;
+
+        box-shadow: 0 20px 40px rgba(99, 102, 241, 0.2);
+      }
+
+      /* Positional Method card specific */
+
+      .method-card.border-blue-100 {
+        background: linear-gradient(
+          135deg,
+          rgba(59, 130, 246, 0.05) 0%,
+
+          rgba(59, 130, 246, 0.1) 100%
+        );
+
+        border-color: #3b82f6;
+      }
+
+      .method-card.border-blue-100:hover {
+        background: linear-gradient(
+          135deg,
+          rgba(59, 130, 246, 0.1) 0%,
+
+          rgba(59, 130, 246, 0.15) 100%
+        );
+
+        border-color: #2563eb;
+
+        box-shadow: 0 20px 40px rgba(59, 130, 246, 0.2);
+      }
+
+      /* Dark mode method cards */
+
+      .dark .method-card {
+        background-color: #1e293b !important;
+
+        border-color: #475569 !important;
+      }
+
+      .dark .method-card.border-indigo-100 {
+        background: linear-gradient(
+          135deg,
+          rgba(99, 102, 241, 0.1) 0%,
+
+          rgba(99, 102, 241, 0.2) 100%
+        ) !important;
+
+        border-color: #6366f1 !important;
+      }
+
+      .dark .method-card.border-indigo-100:hover {
+        background: linear-gradient(
+          135deg,
+          rgba(99, 102, 241, 0.15) 0%,
+
+          rgba(99, 102, 241, 0.25) 100%
+        ) !important;
+
+        border-color: #818cf8 !important;
+
+        box-shadow: 0 20px 40px rgba(99, 102, 241, 0.3) !important;
+      }
+
+      .dark .method-card.border-blue-100 {
+        background: linear-gradient(
+          135deg,
+          rgba(59, 130, 246, 0.1) 0%,
+
+          rgba(59, 130, 246, 0.2) 100%
+        ) !important;
+
+        border-color: #3b82f6 !important;
+      }
+
+      .dark .method-card.border-blue-100:hover {
+        background: linear-gradient(
+          135deg,
+          rgba(59, 130, 246, 0.15) 0%,
+
+          rgba(59, 130, 246, 0.25) 100%
+        ) !important;
+
+        border-color: #60a5fa !important;
+
+        box-shadow: 0 20px 40px rgba(59, 130, 246, 0.3) !important;
+      }
+
+      .dark .method-card .number-badge {
+        background-color: #4f46e5 !important;
+      }
+
+      .dark .method-card.border-blue-100 .number-badge {
+        background-color: #2563eb !important;
+      }
+
+      /* Fix method card text readability in dark mode */
+
+      .dark .method-card p {
+        color: #f1f5f9 !important;
+
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
       }
 
       .quiz-card {
         @apply bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-xl transition-all relative overflow-hidden;
       }
+
       .quiz-card.correct-feedback {
         @apply border-emerald-500 bg-emerald-50;
       }
+
       .quiz-card.incorrect-feedback {
         @apply border-red-500 bg-red-50;
       }
@@ -118,9 +581,11 @@
       .progress-segment {
         @apply h-2 flex-1 rounded-full bg-slate-100 transition-all duration-500;
       }
+
       .progress-segment.active {
         @apply bg-indigo-500;
       }
+
       .progress-segment.completed {
         @apply bg-emerald-500;
       }
@@ -128,18 +593,824 @@
       .nav-unlocked {
         animation: slideDown 0.5s cubic-bezier(0.23, 1, 0.32, 1);
       }
+
       @keyframes slideDown {
         from {
           transform: translateY(-20px);
+
           opacity: 0;
         }
+
         to {
           transform: translateY(0);
+
           opacity: 1;
         }
       }
+
+      /* Dark mode styles */
+
+      .dark {
+        background-color: #0f172a !important;
+
+        color: #e2e8f0 !important;
+      }
+
+      /* Background colors */
+
+      .dark .bg-white {
+        background-color: #1e293b !important;
+      }
+
+      .dark .bg-slate-50 {
+        background-color: #1e293b !important;
+      }
+
+      .dark .bg-slate-100 {
+        background-color: #334155 !important;
+      }
+
+      .dark .bg-slate-900 {
+        background-color: #0f172a !important;
+      }
+
+      .dark .bg-indigo-50 {
+        background-color: #1e293b !important;
+      }
+
+      .dark .bg-indigo-100 {
+        background-color: #1e293b !important;
+      }
+
+      .dark .bg-blue-50 {
+        background-color: #1e293b !important;
+      }
+
+      .dark .bg-emerald-50 {
+        background-color: #064e3b !important;
+      }
+
+      .dark .bg-red-50 {
+        background-color: #7f1d1d !important;
+      }
+
+      .dark .bg-white\/80 {
+        background-color: rgba(30, 41, 59, 0.8) !important;
+      }
+
+      /* Text colors */
+
+      .dark .text-slate-900 {
+        color: #f1f5f9 !important;
+      }
+
+      .dark .text-slate-800 {
+        color: #e2e8f0 !important;
+      }
+
+      .dark .text-slate-600 {
+        color: #cbd5e1 !important;
+      }
+
+      .dark .text-slate-500 {
+        color: #94a3b8 !important;
+      }
+
+      .dark .text-slate-400 {
+        color: #64748b !important;
+      }
+
+      .dark .text-indigo-700 {
+        color: #a5b4fc !important;
+      }
+
+      .dark .text-indigo-900 {
+        color: #c7d2fe !important;
+      }
+
+      .dark .text-blue-700 {
+        color: #93c5fd !important;
+      }
+
+      .dark .text-blue-900 {
+        color: #bfdbfe !important;
+      }
+
+      .dark .text-emerald-700 {
+        color: #6ee7b7 !important;
+      }
+
+      .dark .text-red-700 {
+        color: #fca5a5 !important;
+      }
+
+      /* Border colors */
+
+      .dark .border-slate-200 {
+        border-color: #334155 !important;
+      }
+
+      .dark .border-slate-100 {
+        border-color: #475569 !important;
+      }
+
+      .dark .border-indigo-100 {
+        border-color: #475569 !important;
+      }
+
+      .dark .border-blue-100 {
+        border-color: #475569 !important;
+      }
+
+      .dark .border-indigo-200 {
+        border-color: #475569 !important;
+      }
+
+      .dark .border-amber-500 {
+        border-color: #f59e0b !important;
+      }
+
+      .dark .border-blue-500 {
+        border-color: #3b82f6 !important;
+      }
+
+      /* Hover states */
+
+      .dark .hover\:bg-slate-100:hover {
+        background-color: #334155 !important;
+      }
+
+      .dark .hover\:bg-indigo-600:hover {
+        background-color: #4f46e5 !important;
+      }
+
+      .dark .hover\:bg-slate-700:hover {
+        background-color: #334155 !important;
+      }
+
+      /* Component specific styles */
+
+      .dark .bit-off {
+        background-color: #1e293b !important;
+
+        color: #64748b !important;
+
+        border-color: #334155 !important;
+      }
+
+      .dark .instruction-step {
+        background-color: #1e293b !important;
+
+        border-color: #334155 !important;
+      }
+
+      .dark .quiz-card {
+        background-color: #1e293b !important;
+
+        border-color: #334155 !important;
+      }
+
+      .dark .method-card {
+        background-color: #1e293b !important;
+
+        border-color: #334155 !important;
+      }
+
+      .dark .definition-card {
+        background-color: #1e293b !important;
+      }
+
+      .dark .hint-box {
+        background-color: #1e293b !important;
+
+        border-color: #334155 !important;
+      }
+
+      .dark .progress-segment {
+        background-color: #334155 !important;
+      }
+
+      .dark .video-container {
+        background-color: #1e293b !important;
+      }
+
+      /* Button fixes */
+
+      .dark .bg-emerald-100 {
+        background-color: #064e3b !important;
+      }
+
+      .dark .bg-indigo-50 {
+        background-color: #1e3a8a !important;
+      }
+
+      .dark .bg-blue-50\/30 {
+        background-color: rgba(30, 58, 138, 0.3) !important;
+      }
+
+      .dark .bg-indigo-50\/30 {
+        background-color: rgba(30, 58, 138, 0.3) !important;
+      }
+
+      /* Input field fixes */
+
+      .dark .bg-slate-800 {
+        background-color: #1e293b !important;
+      }
+
+      .dark .border-slate-700 {
+        border-color: #475569 !important;
+      }
+
+      .dark .focus\:border-indigo-500:focus {
+        border-color: #6366f1 !important;
+      }
+
+      .dark .focus\:border-blue-500:focus {
+        border-color: #3b82f6 !important;
+      }
+
+      /* Status badge fix */
+
+      .dark .bg-emerald-100 {
+        background-color: #064e3b !important;
+      }
+
+      .dark .text-emerald-700 {
+        color: #6ee7b7 !important;
+      }
+
+      /* Navigation dots */
+
+      .dark .bg-slate-200 {
+        background-color: #475569 !important;
+      }
+
+      /* Master navigation buttons */
+
+      .dark .bg-slate-50 {
+        background-color: #1e293b !important;
+      }
+
+      /* Initialize Learning button fix */
+
+      .dark .bg-slate-900 {
+        background-color: #1e293b !important;
+      }
+
+      .dark .hover\:bg-slate-800:hover {
+        background-color: #334155 !important;
+      }
+
+      /* Count button enhancements */
+
+      .count-btn {
+        position: relative;
+
+        overflow: hidden;
+
+        background: linear-gradient(135deg, #6366f1 0%, #3b82f6 100%);
+
+        color: white;
+
+        border: none;
+
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+      }
+
+      .count-btn::before {
+        content: "";
+
+        position: absolute;
+
+        top: 0;
+
+        left: -100%;
+
+        width: 100%;
+
+        height: 100%;
+
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.2),
+          transparent
+        );
+
+        transition: left 0.5s;
+      }
+
+      .count-btn:hover::before {
+        left: 100%;
+      }
+
+      .count-btn:hover {
+        transform: translateY(-2px);
+
+        box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+      }
+
+      .count-btn:active {
+        transform: translateY(0) scale(0.98);
+
+        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+      }
+
+      .count-btn.counting {
+        animation: count-pulse 0.6s ease-in-out;
+
+        pointer-events: none;
+      }
+
+      @keyframes count-pulse {
+        0% {
+          transform: scale(1);
+        }
+
+        50% {
+          transform: scale(1.05);
+
+          background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      /* Dark mode count button */
+
+      .dark .count-btn {
+        background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
+
+        box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
+      }
+
+      .dark .count-btn:hover {
+        box-shadow: 0 8px 25px rgba(79, 70, 229, 0.5);
+      }
+
+      /* Enhanced unlock button */
+
+      .unlock-btn {
+        position: relative;
+
+        overflow: hidden;
+
+        background: linear-gradient(135deg, #6366f1 0%, #3b82f6 100%);
+
+        color: white;
+
+        border: none;
+
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+
+        font-weight: 700;
+      }
+
+      .unlock-btn::before {
+        content: "";
+
+        position: absolute;
+
+        top: 0;
+
+        left: -100%;
+
+        width: 100%;
+
+        height: 100%;
+
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.2),
+          transparent
+        );
+
+        transition: left 0.6s;
+      }
+
+      .unlock-btn:hover:not(:disabled)::before {
+        left: 100%;
+      }
+
+      .unlock-btn:hover:not(:disabled) {
+        transform: translateY(-2px) scale(1.02);
+
+        box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+      }
+
+      .unlock-btn:active:not(:disabled) {
+        transform: translateY(0) scale(0.98);
+      }
+
+      .unlock-btn:disabled {
+        background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%);
+
+        cursor: not-allowed;
+
+        opacity: 0.6;
+
+        filter: grayscale(0.8);
+
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .unlock-btn:disabled::after {
+        content: "🔒";
+
+        position: absolute;
+
+        right: 20px;
+
+        top: 50%;
+
+        transform: translateY(-50%);
+
+        font-size: 1.2em;
+
+        opacity: 0.7;
+      }
+
+      .unlock-btn:not(:disabled)::after {
+        content: "🔓";
+
+        position: absolute;
+
+        right: 20px;
+
+        top: 50%;
+
+        transform: translateY(-50%);
+
+        font-size: 1.2em;
+
+        opacity: 0;
+
+        transition: opacity 0.3s ease;
+      }
+
+      .unlock-btn:not(:disabled):hover::after {
+        opacity: 1;
+      }
+
+      .unlock-btn.unlocked {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+
+        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+
+        animation: unlock-celebration 0.6s ease-out;
+      }
+
+      .unlock-btn.unlocked:hover {
+        box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+      }
+
+      .unlock-btn.unlocked::after {
+        content: "✨";
+
+        opacity: 1;
+      }
+
+      @keyframes unlock-celebration {
+        0% {
+          transform: scale(1);
+        }
+
+        25% {
+          transform: scale(1.1) rotate(1deg);
+        }
+
+        50% {
+          transform: scale(1.05) rotate(-1deg);
+        }
+
+        75% {
+          transform: scale(1.02) rotate(0.5deg);
+        }
+
+        100% {
+          transform: scale(1) rotate(0deg);
+        }
+      }
+
+      /* Dark mode unlock button */
+
+      .dark .unlock-btn:not(:disabled) {
+        background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
+
+        box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
+      }
+
+      .dark .unlock-btn:not(:disabled):hover {
+        box-shadow: 0 8px 25px rgba(79, 70, 229, 0.5);
+      }
+
+      .dark .unlock-btn:disabled {
+        background: linear-gradient(135deg, #475569 0%, #334155 100%);
+      }
+
+      .dark .unlock-btn.unlocked {
+        background: linear-gradient(135deg, #059669 0%, #047857 100%);
+
+        box-shadow: 0 4px 15px rgba(5, 150, 105, 0.4);
+      }
+
+      .dark .unlock-btn.unlocked:hover {
+        box-shadow: 0 8px 25px rgba(5, 150, 105, 0.5);
+      }
+
+      /* Phase 2 specific dark mode styling */
+
+      .dark .bg-slate-900 {
+        background-color: #1e293b !important;
+
+        border: 2px solid #475569 !important;
+      }
+
+      .dark .text-indigo-600 {
+        color: #a5b4fc !important;
+      }
+
+      .dark #p2-bit-container {
+        background-color: transparent;
+      }
+
+      .dark #p2-bit-container .bit-card {
+        background-color: #1e293b !important;
+
+        border-color: #475569 !important;
+
+        color: #e2e8f0;
+      }
+
+      .dark #p2-bit-container .bit-on {
+        background-color: #4f46e5 !important;
+
+        color: white;
+
+        border-color: #6366f1 !important;
+
+        box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.4);
+      }
+
+      .dark #p2-bit-container .bit-off {
+        background-color: #334155 !important;
+
+        color: #94a3b8;
+
+        border-color: #475569;
+      }
+
+      /* Phase 2 instruction box dark mode */
+
+      .dark .bg-slate-50 {
+        background-color: #1e293b !important;
+
+        border-color: #334155 !important;
+      }
+
+      .dark .text-slate-600 {
+        color: #cbd5e1 !important;
+      }
+
+      .dark .text-slate-900 {
+        color: #f1f5f9 !important;
+      }
+
+      .dark .text-slate-400 {
+        color: #64748b !important;
+      }
+
+      /* Strong/bold text in dark mode */
+
+      .dark strong {
+        color: #f1f5f9 !important;
+      }
+
+      /* Phase 2 challenge text */
+
+      .dark .text-indigo-600.font-bold {
+        color: #a5b4fc !important;
+      }
+
+      /* Phase 2 container improvements */
+
+      .dark #phase2-sum {
+        background: linear-gradient(
+          135deg,
+          #1e293b 0%,
+
+          #334155 100%
+        ) !important;
+
+        border: 2px solid #475569 !important;
+
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      }
+
+      /* Info icon in dark mode */
+
+      .dark .text-indigo-600 svg {
+        color: #a5b4fc !important;
+      }
+
+      /* Phase 3 (Division Lab) dark mode styling */
+
+      .dark .bg-indigo-100 {
+        background-color: #1e3a8a !important;
+      }
+
+      .dark .text-indigo-700 {
+        color: #a5b4fc !important;
+      }
+
+      .dark #lab-rows {
+        background-color: #1e293b !important;
+
+        border: 2px solid #334155 !important;
+      }
+
+      .dark .bg-slate-50.rounded-\[2rem\] {
+        background-color: #1e293b !important;
+
+        border-color: #334155 !important;
+      }
+
+      .dark .text-slate-400 {
+        color: #64748b !important;
+      }
+
+      .dark .border-t {
+        border-color: #334155 !important;
+      }
+
+      /* Phase 4 (Positional Method) dark mode styling */
+
+      .dark .bg-blue-100 {
+        background-color: #1e3a8a !important;
+      }
+
+      .dark .text-blue-700 {
+        color: #93c5fd !important;
+      }
+
+      .dark .bg-slate-900 {
+        background: linear-gradient(
+          135deg,
+          #1e293b 0%,
+
+          #334155 100%
+        ) !important;
+
+        border: 2px solid #475569 !important;
+      }
+
+      .dark .text-blue-300 {
+        color: #93c5fd !important;
+      }
+
+      .dark .text-indigo-400 {
+        color: #a5b4fc !important;
+      }
+
+      .dark #hw-bit-container {
+        background-color: transparent;
+      }
+
+      .dark #hw-bit-container .bit-card {
+        background-color: #1e293b !important;
+
+        border-color: #475569 !important;
+
+        color: #e2e8f0;
+      }
+
+      .dark #hw-bit-container .bit-on {
+        background-color: #3b82f6 !important;
+
+        color: white;
+
+        border-color: #60a5fa !important;
+
+        box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.4);
+      }
+
+      .dark #hw-bit-container .bit-off {
+        background-color: #334155 !important;
+
+        color: #94a3b8;
+
+        border-color: #475569;
+      }
+
+      .dark .bg-slate-50 {
+        background-color: #1e293b !important;
+
+        border-color: #334155 !important;
+      }
+
+      /* Phase 4.5 (Quiz) dark mode styling */
+
+      .dark .bg-emerald-100 {
+        background-color: #064e3b !important;
+      }
+
+      .dark .text-emerald-600 {
+        color: #6ee7b7 !important;
+      }
+
+      .dark .bg-indigo-900 {
+        background: linear-gradient(
+          135deg,
+          #1e3a8a 0%,
+
+          #312e81 100%
+        ) !important;
+
+        border: 2px solid #475569 !important;
+      }
+
+      .dark .quiz-card {
+        background-color: #1e293b !important;
+
+        border-color: #334155 !important;
+      }
+
+      .dark .quiz-card.correct-feedback {
+        background-color: #064e3b !important;
+
+        border-color: #059669 !important;
+      }
+
+      .dark .quiz-card.incorrect-feedback {
+        background-color: #7f1d1d !important;
+
+        border-color: #dc2626 !important;
+      }
+
+      .dark .quiz-card.correct-feedback .text-slate-900 {
+        color: #6ee7b7 !important;
+      }
+
+      .dark .quiz-card.incorrect-feedback .text-slate-900 {
+        color: #fca5a5 !important;
+      }
+
+      /* Verification status dark mode */
+
+      .dark .bg-emerald-50 {
+        background-color: #064e3b !important;
+
+        border-color: #059669 !important;
+      }
+
+      .dark .text-emerald-700 {
+        color: #6ee7b7 !important;
+      }
+
+      .dark .bg-red-50 {
+        background-color: #7f1d1d !important;
+
+        border-color: #dc2626 !important;
+      }
+
+      .dark .text-red-700 {
+        color: #fca5a5 !important;
+      }
+
+      /* Progress bar dark mode */
+
+      .dark .progress-segment {
+        background-color: #334155 !important;
+      }
+
+      .dark .progress-segment.active {
+        background-color: #6366f1 !important;
+      }
+
+      .dark .progress-segment.completed {
+        background-color: #10b981 !important;
+      }
+
+      /* Completion zone dark mode */
+
+      .dark .bg-emerald-100 {
+        background-color: #064e3b !important;
+      }
+
+      .dark .text-emerald-600 {
+        color: #6ee7b7 !important;
+      }
     </style>
   </head>
+
   <body class="bg-slate-50 min-h-screen text-slate-800 pb-20">
     <header
       id="main-header"
@@ -166,11 +1437,52 @@
                 />
               </svg>
             </button>
+
             <h1 class="font-black text-slate-900 tracking-tight">
               NUMBER <span class="text-indigo-600">ARCHITECT</span>
             </h1>
           </div>
+
           <div class="flex items-center gap-6">
+            <!-- Dark mode toggle -->
+
+            <button
+              id="dark-mode-toggle"
+              onclick="toggleDarkMode()"
+              class="p-2 hover:bg-slate-100 rounded-xl transition-colors text-slate-500 dark:hover:bg-slate-700"
+              title="Toggle dark mode"
+            >
+              <svg
+                id="sun-icon"
+                class="w-5 h-5 hidden dark:block"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+                />
+              </svg>
+
+              <svg
+                id="moon-icon"
+                class="w-5 h-5 block dark:hidden"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+                />
+              </svg>
+            </button>
+
             <div
               id="status-badge"
               class="hidden items-center gap-2 bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest"
@@ -181,19 +1493,30 @@
                   d="M2.166 4.9L9.03 9.125a2.483 2.483 0 002.14 0l6.864-4.225A2.466 2.483 0 0015.5 2h-11a2.466 2.483 0 00-2.334 2.9zM2 7.183V15.5a2.484 2.484 0 002.484 2.5h11.032A2.484 2.484 0 0018 15.5V7.183l-7.03 4.323a1.485 1.485 0 01-1.94 0L2 7.183z"
                 />
               </svg>
+
               Architect Certified
             </div>
+
             <div class="hidden md:flex gap-1">
               <div id="dot-0-1" class="w-2 h-2 rounded-full bg-slate-200"></div>
+
               <div id="dot-0-5" class="w-2 h-2 rounded-full bg-slate-200"></div>
+
               <div id="dot-1" class="w-2 h-2 rounded-full bg-slate-200"></div>
+
               <div id="dot-2" class="w-2 h-2 rounded-full bg-slate-200"></div>
+
               <div id="dot-2-5" class="w-2 h-2 rounded-full bg-slate-200"></div>
+
               <div id="dot-3" class="w-2 h-2 rounded-full bg-slate-200"></div>
+
               <div id="dot-4" class="w-2 h-2 rounded-full bg-slate-200"></div>
+
               <div id="dot-4-5" class="w-2 h-2 rounded-full bg-slate-200"></div>
+
               <div id="dot-5" class="w-2 h-2 rounded-full bg-slate-200"></div>
             </div>
+
             <span
               class="text-[10px] font-bold text-slate-400 uppercase tracking-widest"
               >Phase <span id="current-step-num">0.1</span></span
@@ -202,6 +1525,7 @@
         </div>
 
         <!-- MASTER NAVIGATION (UNLOCKED AT END) -->
+
         <div
           id="master-nav"
           class="hidden border-t border-slate-100 pt-3 nav-unlocked overflow-x-auto whitespace-nowrap pb-1"
@@ -215,36 +1539,42 @@
             >
               Phase 1
             </button>
+
             <button
               onclick="goToStep(2)"
               class="px-3 py-2 bg-slate-50 hover:bg-indigo-600 hover:text-white rounded-lg transition-all border border-slate-100"
             >
               Phase 2
             </button>
+
             <button
               onclick="goToStep(2.5)"
               class="px-3 py-2 bg-slate-50 hover:bg-indigo-600 hover:text-white rounded-lg transition-all border border-slate-100"
             >
               Overview
             </button>
+
             <button
               onclick="goToStep(3)"
               class="px-3 py-2 bg-slate-50 hover:bg-indigo-600 hover:text-white rounded-lg transition-all border border-slate-100"
             >
               Division Lab
             </button>
+
             <button
               onclick="goToStep(4)"
               class="px-3 py-2 bg-slate-50 hover:bg-indigo-600 hover:text-white rounded-lg transition-all border border-slate-100"
             >
               Positional Lab
             </button>
+
             <button
               onclick="goToStep(4.5)"
               class="px-3 py-2 bg-slate-50 hover:bg-indigo-600 hover:text-white rounded-lg transition-all border border-slate-100"
             >
               Quiz
             </button>
+
             <button
               onclick="goToStep(5)"
               class="px-3 py-2 bg-indigo-50 text-indigo-700 hover:bg-indigo-600 hover:text-white rounded-lg transition-all border border-indigo-100"
@@ -258,15 +1588,61 @@
 
     <main class="max-w-5xl mx-auto px-4 mt-8">
       <!-- STEP 0: LANDING -->
+
       <section
         id="step-0"
         class="lesson-step min-h-[85vh] flex flex-col items-center justify-center text-center space-y-12"
       >
         <div
-          class="absolute inset-0 overflow-hidden binary-bg opacity-[0.03] pointer-events-none text-xl leading-relaxed p-12"
+          class="absolute inset-0 overflow-hidden binary-bg opacity-[0.08] pointer-events-none text-2xl leading-relaxed p-12"
         >
-          01001000 01101001 00100000 01001000 01110101 01101101 01100001
-          01101110 01011111
+          <span class="binary-digit">0</span><span class="binary-digit">1</span
+          ><span class="binary-digit">0</span><span class="binary-digit">0</span
+          ><span class="binary-digit">1</span><span class="binary-digit">0</span
+          ><span class="binary-digit">0</span
+          ><span class="binary-digit">0</span>
+
+          <span class="binary-digit">0</span><span class="binary-digit">1</span
+          ><span class="binary-digit">1</span><span class="binary-digit">0</span
+          ><span class="binary-digit">1</span><span class="binary-digit">0</span
+          ><span class="binary-digit">0</span
+          ><span class="binary-digit">1</span>
+
+          <span class="binary-digit">0</span><span class="binary-digit">0</span
+          ><span class="binary-digit">1</span><span class="binary-digit">0</span
+          ><span class="binary-digit">0</span><span class="binary-digit">0</span
+          ><span class="binary-digit">0</span
+          ><span class="binary-digit">0</span>
+
+          <span class="binary-digit">0</span><span class="binary-digit">1</span
+          ><span class="binary-digit">0</span><span class="binary-digit">0</span
+          ><span class="binary-digit">1</span><span class="binary-digit">0</span
+          ><span class="binary-digit">0</span
+          ><span class="binary-digit">0</span>
+
+          <span class="binary-digit">0</span><span class="binary-digit">1</span
+          ><span class="binary-digit">1</span><span class="binary-digit">1</span
+          ><span class="binary-digit">0</span><span class="binary-digit">1</span
+          ><span class="binary-digit">1</span
+          ><span class="binary-digit">0</span>
+
+          <span class="binary-digit">1</span><span class="binary-digit">1</span
+          ><span class="binary-digit">0</span><span class="binary-digit">1</span
+          ><span class="binary-digit">1</span><span class="binary-digit">0</span
+          ><span class="binary-digit">0</span
+          ><span class="binary-digit">0</span>
+
+          <span class="binary-digit">0</span><span class="binary-digit">1</span
+          ><span class="binary-digit">1</span><span class="binary-digit">0</span
+          ><span class="binary-digit">1</span><span class="binary-digit">1</span
+          ><span class="binary-digit">0</span
+          ><span class="binary-digit">1</span>
+
+          <span class="binary-digit">1</span><span class="binary-digit">0</span
+          ><span class="binary-digit">1</span><span class="binary-digit">1</span
+          ><span class="binary-digit">1</span><span class="binary-digit">1</span
+          ><span class="binary-digit">0</span
+          ><span class="binary-digit">1</span>
         </div>
 
         <div
@@ -286,10 +1662,12 @@
               >BINARY</span
             >
           </h1>
+
           <p class="text-xl text-slate-500 max-w-xl mx-auto font-medium">
             Master the conversion from human numbers to digital reality.
           </p>
         </div>
+
         <button
           onclick="goToStep(0.1)"
           class="next-btn-anim bg-slate-900 text-white px-12 py-5 rounded-2xl font-extrabold text-xl shadow-2xl hover:bg-slate-800 transition-all z-10"
@@ -299,6 +1677,7 @@
       </section>
 
       <!-- STEP 0.1: MISSION -->
+
       <section
         id="step-0.1"
         class="lesson-step hidden space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500"
@@ -307,16 +1686,19 @@
           class="bg-white p-12 rounded-[2.5rem] shadow-sm border border-slate-200 text-center"
         >
           <h2 class="text-4xl font-black text-slate-900 mb-6">Your Mission</h2>
+
           <div
             class="bg-indigo-50 border border-indigo-200 p-8 rounded-[2rem] text-left max-w-2xl mx-auto"
           >
             <p class="text-lg text-indigo-900 font-bold">
               By the end of the lesson, you will accurately convert decimal
               numbers (0–255) into binary using both the
+
               <b>Division Method</b> and the <b>Positional Method</b> with at
               least 80% accuracy.
             </p>
           </div>
+
           <button
             onclick="goToStep(0.5)"
             class="mt-8 bg-indigo-600 text-white px-12 py-4 rounded-full font-bold"
@@ -327,9 +1709,11 @@
       </section>
 
       <!-- STEP 0.5: INTRO VIDEO -->
+
       <section id="step-0.5" class="lesson-step hidden space-y-8">
         <div class="bg-white p-10 rounded-[2.5rem] border border-slate-200">
           <h2 class="text-3xl font-black mb-8">Visual Introduction</h2>
+
           <div class="video-container shadow-2xl">
             <iframe
               src="https://www.youtube.com/embed/LpuPe81bc2w"
@@ -337,6 +1721,7 @@
               allowfullscreen
             ></iframe>
           </div>
+
           <button
             onclick="goToStep(1)"
             class="mt-10 mx-auto block bg-indigo-600 text-white px-12 py-4 rounded-full font-bold"
@@ -347,52 +1732,103 @@
       </section>
 
       <!-- STEP 1: CONCEPTS -->
+
       <section id="step-1" class="lesson-step hidden space-y-8">
         <div class="bg-white p-10 rounded-[2.5rem] border border-slate-200">
           <h2 class="text-3xl font-black mb-6">Phase 1: The Blueprint</h2>
+
           <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div class="space-y-6">
               <div class="definition-card p-6 bg-slate-50 rounded-r-2xl">
-                <h3
-                  class="font-bold text-indigo-600 uppercase text-xs tracking-widest mb-2"
-                >
-                  Base-10 (Decimal)
-                </h3>
-                <p class="text-slate-600 text-sm leading-relaxed">
-                  The system humans use. It has <b>10 digits</b> (0-9). Every
-                  time you hit 10, you roll over to a new column (Ones, Tens,
-                  Hundreds).
-                </p>
+                <div class="relative z-10">
+                  <h3
+                    class="font-bold text-indigo-600 uppercase text-xs tracking-widest mb-2 flex items-center gap-2"
+                  >
+                    <svg
+                      class="w-4 h-4"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"
+                      />
+                    </svg>
+
+                    Base-10 (Decimal)
+                  </h3>
+
+                  <p class="text-slate-600 text-sm leading-relaxed">
+                    The system humans use. It has <b>10 digits</b> (0-9). Every
+                    time you hit 10, you roll over to a new column (Ones, Tens,
+                    Hundreds).
+                  </p>
+                </div>
               </div>
+
               <div
                 class="definition-card p-6 bg-slate-50 rounded-r-2xl border-blue-500"
               >
-                <h3
-                  class="font-bold text-blue-600 uppercase text-xs tracking-widest mb-2"
-                >
-                  Base-2 (Binary)
-                </h3>
-                <p class="text-slate-600 text-sm leading-relaxed">
-                  The system computers use. It has only <b>2 digits</b> (0 and
-                  1). Every time you hit 2, you roll over. Columns are powers of
-                  2 (1, 2, 4, 8, 16...).
-                </p>
+                <div class="relative z-10">
+                  <h3
+                    class="font-bold text-blue-600 uppercase text-xs tracking-widest mb-2 flex items-center gap-2"
+                  >
+                    <svg
+                      class="w-4 h-4"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+
+                    Base-2 (Binary)
+                  </h3>
+
+                  <p class="text-slate-600 text-sm leading-relaxed">
+                    The system computers use. It has only <b>2 digits</b> (0 and
+                    1). Every time you hit 2, you roll over. Columns are powers
+                    of 2 (1, 2, 4, 8, 16...).
+                  </p>
+                </div>
               </div>
+
               <div
                 class="definition-card p-6 bg-slate-50 rounded-r-2xl border-amber-500"
               >
-                <h3
-                  class="font-bold text-amber-600 uppercase text-xs tracking-widest mb-2"
-                >
-                  What is a Bit?
-                </h3>
-                <p class="text-slate-600 text-sm leading-relaxed">
-                  Short for <b>BInary digiT</b>. It is the smallest unit of data
-                  in computing, representing a single 0 or 1.
-                </p>
+                <div class="relative z-10">
+                  <h3
+                    class="font-bold text-amber-600 uppercase text-xs tracking-widest mb-2 flex items-center gap-2"
+                  >
+                    <svg
+                      class="w-4 h-4"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path d="M13 7H7v6h6V7z" />
+
+                      <path
+                        fill-rule="evenodd"
+                        d="M7 2a1 1 0 012 0v1h2V2a1 1 0 112 0v1h2a2 2 0 012 2v2h1a1 1 0 110 2h-1v2h1a1 1 0 110 2h-1v2a2 2 0 01-2 2h-2v1a1 1 0 11-2 0v-1H9v1a1 1 0 11-2 0v-1H5a2 2 0 01-2-2v-2H2a1 1 0 110-2h1V9H2a1 1 0 010-2h1V5a2 2 0 012-2h2V2z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+
+                    What is a Bit?
+                  </h3>
+
+                  <p class="text-slate-600 text-sm leading-relaxed">
+                    Short for <b>BInary digiT</b>. It is the smallest unit of
+                    data in computing, representing a single 0 or 1.
+                  </p>
+                </div>
               </div>
             </div>
+
             <!-- MULTI-COUNTER DISPLAY -->
+
             <div
               class="bg-indigo-900 rounded-[2rem] p-8 text-white flex flex-col items-center justify-center shadow-xl"
             >
@@ -403,6 +1839,7 @@
                   >
                     Decimal
                   </div>
+
                   <div
                     id="dec-display"
                     class="text-7xl md:text-8xl font-black tabular-nums"
@@ -410,13 +1847,16 @@
                     0
                   </div>
                 </div>
+
                 <div class="w-px bg-indigo-800 self-stretch"></div>
+
                 <div class="flex-1 text-center">
                   <div
                     class="text-[10px] font-bold text-blue-300 uppercase tracking-widest mb-2"
                   >
                     Binary
                   </div>
+
                   <div
                     id="bin-display"
                     class="text-7xl md:text-8xl font-black tabular-nums mono tracking-tighter"
@@ -425,35 +1865,40 @@
                   </div>
                 </div>
               </div>
+
               <button
                 onclick="countDecimal()"
-                class="w-full bg-white text-indigo-900 py-5 rounded-2xl text-xl font-black hover:bg-indigo-50 transition-all active:scale-95"
+                class="count-btn w-full py-5 rounded-2xl text-xl font-black transition-all"
               >
-                Count to 10
+                <span class="relative z-10">Count to 10</span>
               </button>
             </div>
           </div>
+
           <button
             id="next-btn-1"
             onclick="goToStep(2)"
-            class="btn-locked mt-12 block mx-auto bg-indigo-600 text-white px-12 py-4 rounded-full font-bold transition-all"
+            class="unlock-btn mt-12 block mx-auto px-12 py-4 rounded-full text-lg transition-all"
             disabled
           >
-            Unlock Phase 2 →
+            <span class="relative z-10 pr-8">Unlock Phase 2 →</span>
           </button>
         </div>
       </section>
 
       <!-- STEP 2: POSITIONAL -->
+
       <section id="step-2" class="lesson-step hidden">
         <div class="bg-white p-10 rounded-[2.5rem] border border-slate-200">
           <div class="flex justify-between items-center mb-8">
             <h2 class="text-3xl font-black">Phase 2: Values</h2>
+
             <div class="flex flex-col items-end">
               <span
                 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1"
                 >Total Decimal Value</span
               >
+
               <div
                 class="bg-slate-900 text-white px-8 py-4 rounded-2xl text-5xl font-black"
                 id="phase2-sum"
@@ -480,8 +1925,10 @@
                   d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                 />
               </svg>
+
               What's happening here?
             </h3>
+
             <p>
               In binary, each position represents a <strong>Power of 2</strong>.
               Starting from the right, the values are 1, 2, 4, 8, and so on.
@@ -495,9 +1942,11 @@
             id="p2-bit-container"
             class="flex flex-row-reverse justify-between gap-3 mb-10"
           ></div>
+
           <p class="text-center text-indigo-600 font-bold mb-8 italic">
             Challenge: Set switches to make exactly 23
           </p>
+
           <button
             id="next-btn-2"
             onclick="goToStep(2.5)"
@@ -510,6 +1959,7 @@
       </section>
 
       <!-- STEP 2.5: TOPIC OVERVIEW -->
+
       <section
         id="step-2.5"
         class="lesson-step hidden space-y-8 animate-in fade-in duration-500"
@@ -520,6 +1970,7 @@
           <h2 class="text-5xl font-black text-slate-900 mb-4">
             Decimal to Binary
           </h2>
+
           <p class="text-xl text-slate-500 mb-12">
             There are 2 main methods to perform this conversion.
           </p>
@@ -533,9 +1984,11 @@
               >
                 1
               </div>
+
               <h3 class="text-2xl font-black text-indigo-900 mb-3">
                 Division Method
               </h3>
+
               <p class="text-indigo-700/70 text-sm leading-relaxed">
                 Repeatedly divide your number by 2 and track the remainders.
                 Perfect for large numbers where you don't know the bit values.
@@ -548,9 +2001,11 @@
               >
                 2
               </div>
+
               <h3 class="text-2xl font-black text-blue-900 mb-3">
                 Positional Method
               </h3>
+
               <p class="text-blue-700/70 text-sm leading-relaxed">
                 Compare your number against a table of power-of-2 values. Faster
                 for mental math and small numbers like 0-255.
@@ -568,10 +2023,12 @@
       </section>
 
       <!-- STEP 3: DIVISION LAB -->
+
       <section id="step-3" class="lesson-step hidden space-y-8">
         <div class="bg-white p-10 rounded-[2.5rem] border border-slate-200">
           <div class="flex justify-between items-center mb-8">
             <h2 class="text-3xl font-black">Phase 3: The Division Method</h2>
+
             <span
               class="bg-indigo-100 text-indigo-700 px-4 py-1 rounded-full text-xs font-bold uppercase"
               >Method #1</span
@@ -586,26 +2043,33 @@
                 allowfullscreen
               ></iframe>
             </div>
+
             <div class="space-y-4">
               <div class="instruction-step">
                 <div class="step-circle">1</div>
+
                 <div>
                   <h4 class="font-black text-slate-900 text-sm">
                     Divide & Track
                   </h4>
+
                   <p class="text-xs text-slate-600 mt-1">
                     Divide your decimal number by 2. You will get a
+
                     <b>Quotient</b> (the result) and a <b>Remainder</b> (which
                     will always be either 0 or 1).
                   </p>
                 </div>
               </div>
+
               <div class="instruction-step">
                 <div class="step-circle">2</div>
+
                 <div>
                   <h4 class="font-black text-slate-900 text-sm">
                     Repeat Until Zero
                   </h4>
+
                   <p class="text-xs text-slate-600 mt-1">
                     Take the <b>Quotient</b> from the previous step and divide
                     it by 2 again. Keep repeating this process until your
@@ -613,15 +2077,19 @@
                   </p>
                 </div>
               </div>
+
               <div class="instruction-step">
                 <div class="step-circle">3</div>
+
                 <div>
                   <h4 class="font-black text-slate-900 text-sm">
                     Reverse & Read
                   </h4>
+
                   <p class="text-xs text-slate-600 mt-1">
                     Collect all the <b>Remainders</b> you found. Your binary
                     number is the list of remainders read in
+
                     <b>reverse order</b> (from the bottom up).
                   </p>
                 </div>
@@ -633,11 +2101,13 @@
             <h3 class="text-xl font-bold mb-6">
               Lab Task: Convert <span class="text-indigo-600">53</span>
             </h3>
+
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <div
                 id="lab-rows"
                 class="space-y-3 bg-slate-900 p-6 rounded-[2rem]"
               ></div>
+
               <div
                 class="bg-slate-50 rounded-[2rem] p-10 border-2 border-dashed border-slate-200 flex flex-col items-center justify-center"
               >
@@ -645,6 +2115,7 @@
                   id="bit-stack"
                   class="flex flex-col-reverse gap-2 mb-6 w-full max-w-[100px]"
                 ></div>
+
                 <div
                   id="binary-final-text"
                   class="text-4xl font-black mono text-slate-400"
@@ -667,15 +2138,18 @@
       </section>
 
       <!-- STEP 4: POSITIONAL METHOD -->
+
       <section id="step-4" class="lesson-step hidden space-y-8">
         <div class="bg-white p-10 rounded-[3rem] border border-slate-200">
           <div class="flex justify-between items-center mb-6">
             <h2 class="text-3xl font-black">Phase 4: The Positional Method</h2>
+
             <span
               class="bg-blue-100 text-blue-700 px-4 py-1 rounded-full text-xs font-bold uppercase"
               >Method #2</span
             >
           </div>
+
           <div
             class="flex flex-col md:flex-row justify-around items-center bg-slate-900 p-8 rounded-3xl text-white mb-10"
           >
@@ -683,29 +2157,36 @@
               <p class="text-xs text-indigo-400 uppercase font-black">
                 Number to Convert
               </p>
+
               <p class="text-5xl font-black">53</p>
             </div>
+
             <div class="text-center">
               <p class="text-xs text-blue-400 uppercase font-black">
                 Remaining
               </p>
+
               <p id="decimal-display" class="text-5xl font-black">53</p>
             </div>
           </div>
+
           <div
             id="hw-bit-container"
             class="flex flex-row-reverse justify-between gap-2 mb-10"
           ></div>
+
           <div
             id="math-breakdown"
             class="p-6 bg-slate-50 rounded-2xl text-center mono text-2xl"
           >
             0
           </div>
+
           <div
             id="verification-status"
             class="hidden mt-6 p-4 rounded-xl text-center font-bold"
           ></div>
+
           <button
             id="next-btn-4"
             onclick="goToStep(4.5)"
@@ -718,6 +2199,7 @@
       </section>
 
       <!-- STEP 4.5: QUIZ -->
+
       <section id="step-4.5" class="lesson-step hidden space-y-8">
         <div
           class="bg-white p-10 md:p-16 rounded-[3rem] border border-slate-200 relative overflow-hidden"
@@ -734,10 +2216,12 @@
               <h2 class="text-3xl font-black text-slate-900">
                 Phase 4.5: Knowledge Check
               </h2>
+
               <p class="text-slate-500">
                 Solve 10 challenges. They get harder as you go!
               </p>
             </div>
+
             <div
               class="bg-indigo-900 text-white px-6 py-2 rounded-full font-black text-sm tracking-widest"
             >
@@ -773,13 +2257,16 @@
                 />
               </svg>
             </div>
+
             <h3 class="text-4xl font-black text-slate-900 mb-4">
               Architect Certified!
             </h3>
+
             <p class="text-slate-500 mb-10 max-w-md mx-auto">
               You've unlocked the <strong>Master Navigation Bar</strong>. You
               can now jump to any part of the lesson using the menu at the top.
             </p>
+
             <button
               id="next-btn-4-5"
               onclick="goToStep(5)"
@@ -792,9 +2279,11 @@
       </section>
 
       <!-- STEP 5: SANDBOX -->
+
       <section id="step-5" class="lesson-step hidden">
         <div class="bg-slate-900 text-white p-12 rounded-[3rem] text-center">
           <h2 class="text-4xl font-black mb-10">Universal Converter</h2>
+
           <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-2xl mx-auto">
             <div>
               <label
@@ -807,6 +2296,7 @@
                 class="w-full bg-slate-800 p-6 rounded-2xl text-3xl font-bold border-2 border-slate-700 focus:border-indigo-500 outline-none"
               />
             </div>
+
             <div>
               <label
                 class="block text-xs mb-2 text-blue-400 uppercase font-bold tracking-widest"
@@ -819,6 +2309,7 @@
               />
             </div>
           </div>
+
           <button
             onclick="goToStep(0)"
             class="mt-12 text-slate-500 font-bold underline"
@@ -831,72 +2322,147 @@
 
     <script>
       let currentStep = 0;
+
       const bitValues = [1, 2, 4, 8, 16, 32, 64, 128];
+
       const stepOrder = [0, 0.1, 0.5, 1, 2, 2.5, 3, 4, 4.5, 5];
+
       let hasCompletedEverything = false;
 
       let p2Bits = Array(8).fill(0);
+
       let hwBits = Array(8).fill(0);
+
+      // Dark mode functionality
+
+      function toggleDarkMode() {
+        const body = document.body;
+
+        const isDark = body.classList.contains("dark");
+
+        if (isDark) {
+          body.classList.remove("dark");
+
+          localStorage.setItem("darkMode", "false");
+        } else {
+          body.classList.add("dark");
+
+          localStorage.setItem("darkMode", "true");
+        }
+      }
+
+      // Initialize dark mode from localStorage
+
+      function initDarkMode() {
+        const darkModePref = localStorage.getItem("darkMode");
+
+        if (darkModePref === "true") {
+          document.body.classList.add("dark");
+        }
+      }
+
+      // Call initDarkMode when page loads
+
+      initDarkMode();
 
       const quizQuestions = [
         {
           type: "b2d",
+
           q: "1010",
+
           a: "10",
+
           hint: "Identify '1' positions: 8 + 2. Add them up!",
         },
+
         {
           type: "d2b",
+
           q: "7",
+
           a: "111",
+
           hint: "Think positional: 4 + 2 + 1 = 7. All three rightmost switches ON.",
         },
+
         {
           type: "b2d",
+
           q: "1111",
+
           a: "15",
+
           hint: "A sequence of four '1's at the end is 8 + 4 + 2 + 1.",
         },
+
         {
           type: "d2b",
+
           q: "19",
+
           a: "10011",
+
           hint: "Subtraction: 19 - 16 = 3. Now convert 3.",
         },
+
         {
           type: "b2d",
+
           q: "00101010",
+
           a: "42",
+
           hint: "Check positions: 32 + 8 + 2.",
         },
+
         {
           type: "d2b",
+
           q: "63",
+
           a: "111111",
+
           hint: "Hint: 63 is one less than 64. This means all bits smaller than 64 are ON.",
         },
+
         {
           type: "b2d",
+
           q: "10000001",
+
           a: "129",
+
           hint: "Just add the two ends: 128 + 1.",
         },
+
         {
           type: "d2b",
+
           q: "85",
+
           a: "1010101",
+
           hint: "Alternating bits! Try 64 + 16 + 4 + 1.",
         },
+
         {
           type: "d2b",
+
           q: "127",
+
           a: "1111111",
+
           hint: "This is one less than 128. Turn everything smaller than 128 to '1'.",
         },
+
         {
           type: "d2b",
+
           q: "255",
+
           a: "11111111",
+
           hint: "The max value! Every bit in the 8-bit system must be ON.",
         },
       ];
@@ -905,134 +2471,210 @@
 
       function goToStep(num) {
         currentStep = num;
+
         document
+
           .querySelectorAll(".lesson-step")
+
           .forEach((s) => s.classList.add("hidden"));
+
         document.getElementById(`step-${num}`).classList.remove("hidden");
+
         const header = document.getElementById("main-header");
 
         if (num > 0) {
           header.classList.remove("hidden");
+
           document.getElementById("current-step-num").innerText = num;
+
           const dots = [0.1, 0.5, 1, 2, 2.5, 3, 4, 4.5, 5];
+
           dots.forEach((d) => {
             const elId = `dot-${d.toString().replace(".", "-")}`;
+
             const el = document.getElementById(elId);
+
             if (el) el.style.backgroundColor = d <= num ? "#4f46e5" : "#e2e8f0";
           });
         } else header.classList.add("hidden");
 
         if (hasCompletedEverything) {
           document.getElementById("master-nav").classList.remove("hidden");
+
           document.getElementById("status-badge").classList.remove("hidden");
+
           document.getElementById("status-badge").classList.add("flex");
         }
 
         window.scrollTo(0, 0);
+
         if (num === 1) resetPhase1();
+
         if (num === 2) renderP2();
+
         if (num === 3) initLab();
+
         if (num === 4) renderHw();
+
         if (num === 4.5) initSequentialQuiz();
       }
 
       function goBack() {
         const idx = stepOrder.indexOf(currentStep);
+
         if (idx > 0) goToStep(stepOrder[idx - 1]);
       }
 
       function unlockButton(id) {
         const bId = `next-btn-${id.toString().replace(".", "-")}`;
+
         const b = document.getElementById(bId);
+
         if (b) {
           b.disabled = false;
+
           b.classList.remove("btn-locked");
+
           b.classList.add("next-btn-anim");
         }
       }
 
       let dc = 0;
+
       function resetPhase1() {
         dc = 0;
+
         document.getElementById("dec-display").innerText = "0";
+
         document.getElementById("bin-display").innerText = "0000";
       }
 
       function countDecimal() {
         dc++;
+
         const currentVal = dc % 10;
+
         document.getElementById("dec-display").innerText = currentVal;
+
         document.getElementById("bin-display").innerText = currentVal
+
           .toString(2)
+
           .padStart(4, "0");
+
         if (dc >= 10) unlockButton(1);
       }
 
       function renderP2() {
         const c = document.getElementById("p2-bit-container");
+
         c.innerHTML = "";
+
         bitValues.forEach((v, i) => {
           const wrapper = document.createElement("div");
+
           wrapper.className = "flex flex-col items-center flex-1 gap-3";
+
           const btn = document.createElement("button");
+
           btn.className = `w-full h-20 rounded-xl font-black text-xl transition-all ${p2Bits[i] ? "bit-on" : "bit-off"}`;
+
           btn.innerText = p2Bits[i];
+
           btn.onclick = () => {
             p2Bits[i] = 1 - p2Bits[i];
+
             renderP2();
           };
+
           const label = document.createElement("span");
+
           label.className = "text-[10px] font-black text-slate-400 mono";
+
           label.innerText = v;
+
           wrapper.appendChild(btn);
+
           wrapper.appendChild(label);
+
           c.appendChild(wrapper);
         });
+
         const sum = p2Bits.reduce((acc, b, i) => acc + b * bitValues[i], 0);
+
         document.getElementById("phase2-sum").innerText = sum;
+
         if (sum === 23) unlockButton(2);
       }
 
       const LAB = [
         { v: 53, q: 26, r: 1 },
+
         { v: 26, q: 13, r: 0 },
+
         { v: 13, q: 6, r: 1 },
+
         { v: 6, q: 3, r: 0 },
+
         { v: 3, q: 1, r: 1 },
+
         { v: 1, q: 0, r: 1 },
       ];
+
       function initLab() {
         const c = document.getElementById("lab-rows");
+
         c.innerHTML = "";
+
         LAB.forEach((t, i) => {
           const row = document.createElement("div");
+
           row.className = `grid grid-cols-4 gap-2 items-center p-2 rounded-xl transition-all ${i === 0 ? "row-active" : "opacity-20"}`;
+
           row.id = `lab-row-${i}`;
+
           row.innerHTML = `
+
                     <div class="text-white text-center font-bold">${i === 0 ? 53 : "?"}</div>
+
                     <input type="number" id="lab-q-${i}" placeholder="Q" class="bg-slate-700 text-white p-2 rounded text-center">
+
                     <input type="number" id="lab-r-${i}" placeholder="R" class="bg-slate-700 text-white p-2 rounded text-center">
+
                     <button onclick="checkLab(${i})" class="bg-indigo-600 text-white rounded p-2 text-xs font-bold">Check</button>
+
                 `;
+
           c.appendChild(row);
         });
       }
+
       function checkLab(i) {
         const q = parseInt(document.getElementById(`lab-q-${i}`).value);
+
         const r = parseInt(document.getElementById(`lab-r-${i}`).value);
+
         if (q === LAB[i].q && r === LAB[i].r) {
           const pill = document.createElement("div");
+
           pill.className =
             "remainder-pill visible bg-indigo-600 text-white text-center py-2 rounded font-bold";
+
           pill.innerText = r;
+
           document.getElementById("bit-stack").appendChild(pill);
+
           if (i < LAB.length - 1) {
             const next = document.getElementById(`lab-row-${i + 1}`);
+
             next.classList.remove("opacity-20");
+
             next.classList.add("row-active");
+
             next.children[0].innerText = LAB[i].q;
           } else {
             document.getElementById("binary-final-text").innerText = "00110101";
+
             unlockButton(3);
           }
         }
@@ -1040,54 +2682,81 @@
 
       function renderHw() {
         const c = document.getElementById("hw-bit-container");
+
         c.innerHTML = "";
+
         bitValues.forEach((v, i) => {
           const btn = document.createElement("button");
+
           btn.className = `flex-1 h-16 rounded-xl font-black transition-all ${hwBits[i] ? "bit-on" : "bit-off"}`;
+
           btn.innerText = hwBits[i];
+
           btn.onclick = () => {
             hwBits[i] = 1 - hwBits[i];
+
             renderHw();
           };
+
           c.appendChild(btn);
         });
+
         const total = hwBits.reduce((acc, b, i) => acc + b * bitValues[i], 0);
+
         document.getElementById("decimal-display").innerText = 53 - total;
+
         const parts = hwBits
+
           .map((b, i) => (b ? bitValues[i] : null))
+
           .filter((n) => n)
+
           .reverse();
+
         document.getElementById("math-breakdown").innerText = parts.length
           ? parts.join(" + ") + " = " + total
           : "0";
+
         const status = document.getElementById("verification-status");
+
         if (total === 53) {
           status.innerText = "MATCH! 53 is now 110101.";
+
           status.className = "block bg-emerald-500 text-white p-4 rounded-xl";
+
           unlockButton(4);
         } else status.className = "hidden";
       }
 
       function initSequentialQuiz() {
         currentQuizIndex = 0;
+
         const bar = document.getElementById("quiz-progress-bar");
+
         bar.innerHTML = quizQuestions
+
           .map(
             (_, i) =>
               `<div id="progress-seg-${i}" class="progress-segment"></div>`,
           )
+
           .join("");
+
         renderActiveQuestion();
       }
 
       function renderActiveQuestion() {
         const q = quizQuestions[currentQuizIndex];
+
         const container = document.getElementById("active-question-card");
+
         const numDisplay = document.getElementById("quiz-current-num");
+
         numDisplay.innerText = currentQuizIndex + 1;
 
         quizQuestions.forEach((_, i) => {
           const seg = document.getElementById(`progress-seg-${i}`);
+
           seg.className =
             "progress-segment " +
             (i < currentQuizIndex
@@ -1103,35 +2772,57 @@
             : `Convert binary <span class="text-blue-600 mono font-bold tracking-widest">${q.q}</span> to decimal`;
 
         container.innerHTML = `
+
                 <div class="flex justify-between items-center mb-8">
+
                     <div class="text-xs font-black text-slate-400 uppercase tracking-widest">Question ${currentQuizIndex + 1}</div>
+
                     <button onclick="toggleQuizHint()" class="flex items-center gap-2 bg-indigo-50 text-indigo-600 px-4 py-2 rounded-xl text-xs font-bold border border-indigo-100 hover:bg-indigo-100 transition-colors">
+
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+
                         Need a Hint?
+
                     </button>
+
                 </div>
+
                 <h3 class="text-3xl font-black text-slate-900 mb-10 text-center leading-tight">${label}</h3>
+
                 <div class="flex flex-col gap-4">
+
                     <input type="text" id="quiz-active-input" 
+
                         class="w-full bg-slate-50 border-2 border-slate-200 rounded-3xl p-6 text-2xl font-black text-center mono focus:outline-none focus:border-indigo-500 transition-colors" 
+
                         placeholder="Enter Result..."
+
                         onkeydown="if(event.key==='Enter') checkSequentialQuiz()">
+
                     <button onclick="checkSequentialQuiz()" class="w-full bg-slate-900 text-white py-6 rounded-3xl text-xl font-bold hover:bg-slate-800 shadow-xl transition-all">Submit Answer</button>
+
                 </div>
+
                 <div id="quiz-hint-area" class="hint-box"><strong>HINT:</strong> ${q.hint}</div>
+
             `;
+
         document.getElementById("quiz-active-input").focus();
       }
 
       function toggleQuizHint() {
         const el = document.getElementById("quiz-hint-area");
+
         el.style.display = el.style.display === "block" ? "none" : "block";
       }
 
       function checkSequentialQuiz() {
         const input = document.getElementById("quiz-active-input");
+
         const card = document.getElementById("active-question-card");
+
         const val = input.value.trim();
+
         const correct =
           val.replace(/^0+/, "") ===
             quizQuestions[currentQuizIndex].a.replace(/^0+/, "") ||
@@ -1139,32 +2830,51 @@
 
         if (correct) {
           card.classList.add("correct-feedback");
+
           setTimeout(() => {
             card.classList.remove("correct-feedback");
+
             if (currentQuizIndex < quizQuestions.length - 1) {
               currentQuizIndex++;
+
               renderActiveQuestion();
             } else {
               hasCompletedEverything = true;
+
               document
+
                 .getElementById("quiz-active-zone")
+
                 .classList.add("hidden");
+
               document
+
                 .getElementById("quiz-completion-zone")
+
                 .classList.remove("hidden");
+
               document
+
                 .getElementById("quiz-current-num")
+
                 .parentElement.classList.add("hidden");
+
               document.getElementById("master-nav").classList.remove("hidden");
+
               document
+
                 .getElementById("status-badge")
+
                 .classList.remove("hidden");
+
               document.getElementById("status-badge").classList.add("flex");
             }
           }, 600);
         } else {
           card.classList.add("incorrect-feedback");
+
           document.getElementById("quiz-hint-area").style.display = "block";
+
           setTimeout(() => card.classList.remove("incorrect-feedback"), 500);
         }
       }
@@ -1172,12 +2882,16 @@
       function sbConvert(src) {
         const d = document.getElementById("sb-dec"),
           b = document.getElementById("sb-bin");
+
         if (src === "dec") {
           let v = Math.min(255, parseInt(d.value || 0));
+
           b.value = v.toString(2).padStart(8, "0");
         } else {
           let v = b.value.replace(/[^01]/g, "").substring(0, 8);
+
           b.value = v;
+
           d.value = v ? parseInt(v, 2) : 0;
         }
       }
